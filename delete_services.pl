@@ -18,20 +18,25 @@ my $xmlsimple = XML::Simple->new();
 my $data = $xmlsimple->XMLin($docs);
 
 #print Data::Dumper::Dumper( $data );
+my @listOfFields;
+my $configfile = "config.yml";
+my $config = YAML::LoadFile( $configfile );
+push @listOfFields, $config->{$_}->{field} for keys %$config;
+
 
 # Delete non-existent services from biblio
 print "Supprime les services qui n'existent plus\n";
 my $biblios = get_biblios();
 my @to_del;
 push @to_del, $_ for keys %{ $data->{service} };
-print Data::Dumper::Dumper( \@to_del );
 
 foreach my $biblio ( @$biblios ) {
     my $biblionumber = $biblio->{biblionumber};
     my $record = GetMarcBiblio( $biblionumber );
 
     my $countfield = 0;
-    foreach my $field ( $record->field(qw/857 388 389 398/) ) {
+    #foreach my $field ( $record->field(qw/857 388 389 398/) ) {
+    foreach my $field ( $record->field(@listOfFields) ) {
 	my $id = $field->subfield('3');
 	if ( $id && in_array( \@to_del, $id) ) {
 	    $countfield++;
