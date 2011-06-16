@@ -157,7 +157,7 @@ sub createField {
 	my @or = split /\|/, $serviceKey;
 	if ( scalar( @or ) > 1 ) {
 	    foreach ( @or ) {
-		$value = $service->{ $_ } if $service->{ $_ };
+		$value = $service->{ $_ } if $service->{ $_ } && ref($service->{ $_ }) ne 'HASH';
 		last if $value;
 	    }
 	}
