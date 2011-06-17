@@ -11,7 +11,7 @@ use utf8;
 use YAML;
 use open qw/ :std :utf8 /;
 
-my $url = 'http://www.reseau-mirabel.info/devel/rest.php?suppr';
+my $url = 'http://www.reseau-mirabel.info/rest.php?suppr';
 
 my $docs = get $url;
 my $xmlsimple = XML::Simple->new();
