@@ -29,7 +29,7 @@ GetOptions (
 if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) { warn "***ERROR: -n, -e, -l, can't be used together\n"; print_usage(); exit }
 if ( $all && ( $partenaire || $issn || $issnl || $issne || $type || $acces ) ) { warn "***ERROR: -all can't be used with an other option"; print_usage(); exit }
 
-my $url = "http://www.reseau-mirabel.info/rest.php?";
+my $url = "http://www.reseau-mirabel.info/devel/rest.php?";
 
 if ( $all ) {
     $url .= "all";
@@ -43,13 +43,17 @@ if ( $all ) {
     $url .= $url ~~ /\?$/ ? "couverture=$couverture" : "&couverture=$couverture" if $couverture;
 }
 
-my $properfile = "properdata.txt";
+my $path = getConfigPath();
+die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n" unless $path;
+
+my $properfile = $path . "properdata.txt";
 open my $pdfh,$properfile or die "$properfile : $!";
 my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
 
-my $configfile = "config.yml";
+my $configfile = $path . "config.yml";
 my $config = YAML::LoadFile( $configfile );
 
+print "URL: $url\n";
 my $docs = get $url;
 my $xmlsimple = XML::Simple->new( ForceArray => [ 'revue', 'service' ], );
 my $data = $xmlsimple->XMLin($docs);
@@ -207,6 +211,19 @@ sub in_array {
     my ($arr,$search_for) = @_;
     my %items = map {$_ => 1} @$arr;
     return (exists($items{$search_for}))?1:0;
+}
+
+sub getConfigPath {
+    # Read the koha-conf.xml and get configuration path
+    my $kohaConfFile = $ENV{'KOHA_CONF'};
+    die "Environment variables '\$KOHA_CONF' is not set.\n" unless $kohaConfFile;
+    my $xml = XML::Simple->new();
+    my $koha_conf = $xml->XMLin($kohaConfFile) ;
+
+    my $path = $koha_conf->{config}->{mirabel};
+    return $path if $path && ref($path) ne 'HASH';
+    return 0;
+
 }
 
 sub print_usage {
