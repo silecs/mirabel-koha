@@ -158,6 +158,10 @@ sub createField {
 	my $value;
 
 	# Cas des valeurs séparées par |. (ou)
+	my ($fields, $others) = split(/:/, $serviceKey);
+	$serviceKey = $fields;
+	$others =~ s/(^\(|)$//;
+
 	my @or = split /\|/, $serviceKey;
 	if ( scalar( @or ) > 1 ) {
 	    foreach ( @or ) {
@@ -172,7 +176,7 @@ sub createField {
 	    my $count = 0;
 	    foreach ( @and ) {
 		$count++;
-		$value .= " à " if $count > 1 && ref($service->{ $_ }) ne 'HASH'; 
+		$value .= $others if $count > 1 && ref($service->{ $_ }) ne 'HASH'; 
 		$value .= $service->{ $_ } if ref($service->{ $_ }) ne 'HASH';
 	    }
 	}
