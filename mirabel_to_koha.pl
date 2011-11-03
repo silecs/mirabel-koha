@@ -160,6 +160,7 @@ sub createField {
 	# Cas des valeurs séparées par |. (ou)
 	my ($fields, $others) = split(/:/, $serviceKey);
 	$serviceKey = $fields;
+	$others ||= '';
 	$others =~ s/(^\(|)$//;
 
 	my @or = split /\|/, $serviceKey;
