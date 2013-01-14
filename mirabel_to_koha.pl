@@ -16,7 +16,7 @@ my ( $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $a
 GetOptions (
     'partenaire|p=i' => \$partenaire,
     'issn|n=s' => \$issn,
-    'issnl|l=s' => \$issnl, 
+    'issnl|l=s' => \$issnl,
     'issne|e=s' => \$issne,
     'type|t=s' => \$type,
     'acces|a=s' => \$acces,
@@ -55,11 +55,15 @@ my $config = YAML::LoadFile( $configfile );
 
 print "URL: $url\n";
 my $docs = get $url;
-my $xmlsimple = XML::Simple->new( ForceArray => [ 'revue', 'service' ], );
+my $xmlsimple = XML::Simple->new( ForceArray => [ 'revue', 'service' ], SuppressEmpty => '');
 my $data = $xmlsimple->XMLin($docs);
 
 $| = 1;
 foreach my $biblio ( @{ $data->{revue} } ) {
+    if (!$biblio->{idpartenairerevue}) {
+        printf "La revue d'ISSN %s n'a pas d'identifiant local.\n", $biblio->{issn};
+        next;
+    }
     print "Mise à jour de la notice " . $biblio->{idpartenairerevue} . ":\n";
     my $result = doit( $biblio );
     print ( $result == $biblio->{idpartenairerevue} ? "Notice modifiée avec succés\n" : "Erreur lors de la modification de la notice\n" );
@@ -82,7 +86,7 @@ sub doit {
     my $record = GetMarcBiblio( $biblio->{idpartenairerevue} );
     print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
 
-    my $result = '';
+    my $result = 0;
     if ( $record ) {
 	foreach my $service ( @services ) {
 	    my $type = $properdata->{ $service->{type}  };
