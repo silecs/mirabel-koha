@@ -1,3 +1,4 @@
+Intégral;texteint
 Texte Intégral;texteint
 Intégral;texteint
 Sommaire;som

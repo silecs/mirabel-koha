@@ -1,16 +1,19 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
+use open qw/ :std :utf8 /;
+
 use Getopt::Long;
 use C4::Context;
 use XML::Simple;
 use LWP::Simple;
 use C4::Biblio;
 use MARC::File::USMARC;
-use utf8;
 use YAML;
 use DateTime;
-use open qw/ :std :utf8 /;
+
+use Mirabel;
 
 # Services deleted since yesterday
 $from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();

@@ -1,15 +1,17 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
+use open qw/ :std :utf8 /;
+
 use Getopt::Long;
 use C4::Context;
 use XML::Simple;
 use LWP::Simple;
 use C4::Biblio;
 use MARC::File::USMARC;
-use utf8;
 use YAML;
-use open qw/ :std :utf8 /;
+use Mirabel;
 
 my ( $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all );
 
@@ -26,8 +28,16 @@ GetOptions (
 );
 
 
-if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) { warn "***ERROR: -n, -e, -l, can't be used together\n"; print_usage(); exit }
-if ( $all && ( $partenaire || $issn || $issnl || $issne || $type || $acces ) ) { warn "***ERROR: -all can't be used with an other option"; print_usage(); exit }
+if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) {
+    warn "***ERROR: -n, -e, -l, can't be used together\n";
+    print_usage();
+    exit;
+}
+if ( $all && ( $partenaire || $issn || $issnl || $issne || $type || $acces ) ) {
+    warn "***ERROR: -all can't be used with an other option";
+    print_usage();
+    exit;
+}
 
 my $url = "http://www.reseau-mirabel.info/devel/rest.php?";
 
@@ -55,8 +65,7 @@ my $config = YAML::LoadFile( $configfile );
 
 print "URL: $url\n";
 my $docs = get $url;
-my $xmlsimple = XML::Simple->new( ForceArray => [ 'revue', 'service' ], SuppressEmpty => '');
-my $data = $xmlsimple->XMLin($docs);
+my $data = Mirabel::parse_xml($docs)
 
 $| = 1;
 foreach my $biblio ( @{ $data->{revue} } ) {
@@ -65,59 +74,47 @@ foreach my $biblio ( @{ $data->{revue} } ) {
         next;
     }
     print "Mise à jour de la notice " . $biblio->{idpartenairerevue} . ":\n";
-    my $result = doit( $biblio );
-    print ( $result == $biblio->{idpartenairerevue} ? "Notice modifiée avec succés\n" : "Erreur lors de la modification de la notice\n" );
-    print "===================================================================\n\n";
+    my $services = get_services( $biblio, $properdata, $config );
+
+    my $record = GetMarcBiblio( $biblio->{idpartenairerevue} );
+    print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
+
+    if ($record) {
+	$result = import_services($biblio, $services, $record);
+	print ( $result == $biblio->{idpartenairerevue} ? "Notice modifiée avec succès\n" : "Erreur lors de la modification de la notice\n" );
+	print "===================================================================\n\n";
+    }
 }
 
 ##################################################################################
 ###                            SUB                                             ###
 ##################################################################################
 
-sub doit {
-    my $biblio = shift;
+sub import_services {
+    my ($biblio, $services, $record) = @_;
+    foreach my $s ( @$services ) {
+	#delete_same( $record, $todo, $service);
 
-    my @services;
-    foreach ( keys %{ $biblio->{services}->{service} } ) {
-        $biblio->{services}->{service}->{$_}->{id} = $_;
-        push @services, $biblio->{services}->{service}->{$_};
-    }
+	my $newfield = createField( $s->{todo}, $s->{service} );
+	reorder_subfields( $newfield );
 
-    my $record = GetMarcBiblio( $biblio->{idpartenairerevue} );
-    print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
-
-    my $result = 0;
-    if ( $record ) {
-	foreach my $service ( @services ) {
-	    my $type = $properdata->{ $service->{type}  };
-	    my $id = $service->{id};
-	    my $todo = $config->{ $type } if $config->{ $type };
-	    return unless $todo;
-
-	    #delete_same( $record, $todo, $service);
-
-	    my $newfield = createField( $todo, $service );
-	    reorder_subfields( $newfield );
-
-	    my $exists = 0;
-	    foreach my $field ( $record->field( $todo->{field} ) ) {
-		my $f3 = $field->subfield('3');
-		if ( $f3 && $id eq $f3 ) {
-		    $exists = 1;
-		    $field->replace_with($newfield);
-		    print "    field " . $todo->{field} . " updated\n"; 
-		}
+	my $exists = 0;
+	foreach my $field ( $record->field( $s->{todo}{field} ) ) {
+	    my $f3 = $field->subfield('3');
+	    if ( $f3 && $id eq $f3 ) {
+		$exists = 1;
+		$field->replace_with($newfield);
+		print "    field " . $s->{todo}{field} . " updated\n"; 
 	    }
-	    unless ( $exists ) {
-		$record->insert_fields_ordered( $newfield );
-		print "    field " . $todo->{field} . " created\n"; 
-	    }
-	    print $newfield->as_formatted ."\n";
 	}
-	my $fmk = GetFrameworkCode( $biblio->{idpartenairerevue} );
-	$result = ModBiblioMarc( $record, $biblio->{idpartenairerevue}, $fmk );
+	unless ( $exists ) {
+	    $record->insert_fields_ordered( $newfield );
+	    print "    field " . $s->{todo}{field} . " created\n"; 
+	}
+	print $newfield->as_formatted ."\n";
     }
-    return $result;
+    my $fmk = GetFrameworkCode( $biblio->{idpartenairerevue} );
+    return ModBiblioMarc( $record, $biblio->{idpartenairerevue}, $fmk );
 }
 
 sub reorder_subfields {
@@ -205,21 +202,6 @@ sub createField {
     }
 
     return $field;
-}
-
-sub get_biblios {
-    my $dbh = C4::Context->dbh;
-    my $query = "SELECT biblionumber from biblio";
-    my $sth = $dbh->prepare($query);
-    $sth->execute();
-    my $result = $sth->fetchall_arrayref({});
-    return $result;
-}
-
-sub in_array {
-    my ($arr,$search_for) = @_;
-    my %items = map {$_ => 1} @$arr;
-    return (exists($items{$search_for}))?1:0;
 }
 
 sub getConfigPath {
