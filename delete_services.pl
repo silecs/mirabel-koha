@@ -9,9 +9,12 @@ use C4::Biblio;
 use MARC::File::USMARC;
 use utf8;
 use YAML;
+use DateTime;
 use open qw/ :std :utf8 /;
 
-my $url = 'http://www.reseau-mirabel.info/rest.php?suppr';
+# Services deleted since yesterday
+$from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();
+my $url = 'http://www.reseau-mirabel.info/site/service?suppr=' . $from;
 
 my $docs = get $url;
 my $xmlsimple = XML::Simple->new();
