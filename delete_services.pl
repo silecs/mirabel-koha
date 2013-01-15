@@ -13,6 +13,8 @@ use MARC::File::USMARC;
 use YAML;
 use DateTime;
 
+use FindBin;
+use lib "$FindBin::Bin";
 use Mirabel;
 
 # Services deleted since yesterday

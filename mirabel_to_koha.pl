@@ -11,6 +11,9 @@ use LWP::Simple;
 use C4::Biblio;
 use MARC::File::USMARC;
 use YAML;
+
+use FindBin;
+use lib "$FindBin::Bin";
 use Mirabel;
 
 my ( $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all );
