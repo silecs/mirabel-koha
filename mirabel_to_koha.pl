@@ -68,7 +68,7 @@ my $config = YAML::LoadFile( $configfile );
 
 print "URL: $url\n";
 my $docs = get $url;
-my $data = Mirabel::parse_xml($docs)
+my $data = Mirabel::parse_xml($docs);
 
 $| = 1;
 foreach my $biblio ( @{ $data->{revue} } ) {
@@ -83,7 +83,7 @@ foreach my $biblio ( @{ $data->{revue} } ) {
     print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
 
     if ($record) {
-	$result = import_services($biblio, $services, $record);
+	my $result = import_services($biblio, $services, $record);
 	print ( $result == $biblio->{idpartenairerevue} ? "Notice modifiée avec succès\n" : "Erreur lors de la modification de la notice\n" );
 	print "===================================================================\n\n";
     }
@@ -104,7 +104,7 @@ sub import_services {
 	my $exists = 0;
 	foreach my $field ( $record->field( $s->{todo}{field} ) ) {
 	    my $f3 = $field->subfield('3');
-	    if ( $f3 && $id eq $f3 ) {
+	    if ( $f3 && $s->{id} eq $f3 ) {
 		$exists = 1;
 		$field->replace_with($newfield);
 		print "    field " . $s->{todo}{field} . " updated\n"; 
