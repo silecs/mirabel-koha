@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<revues>
+<revue>
+	<issn>0001-7728</issn>
+	<url>http://www.ajda.fr</url>
+	<idpartenairerevue>30</idpartenairerevue>
+	<services>
+	<service>
+		<id>1195</id>
+		<nom>Dialnet</nom>
+		<acces>Libre</acces>
+		<type>Sommaire</type>
+		<couverture></couverture>
+		<urlservice>http://dialnet.unirioja.es/</urlservice>
+		<urldirecte>http://dialnet.unirioja.es/servlet/revista?tipo_busqueda=CODIGO&amp;clave_revista=23</urldirecte>
+		<debut>2000</debut>
+		<fin></fin>
+	</service>
+	<service>
+		<id>1844</id>
+		<nom>Dalloz</nom>
+		<acces>Restreint</acces>
+		<type>Intégral</type>
+		<couverture></couverture>
+		<urlservice>http://www.dalloz.fr/</urlservice>
+		<urldirecte>http://bu.dalloz.fr/</urldirecte>
+		<debut>1990-01</debut>
+		<fin></fin>
+	</service>
+	<service>
+		<id>4515</id>
+		<nom>Sign@l</nom>
+		<acces>Libre</acces>
+		<type>Indexation</type>
+		<couverture>Sélection d'articles</couverture>
+		<selection />
+		<urlservice>http://doc.sciencespo-lyon.fr/Signal/</urlservice>
+		<urldirecte>http://doc.sciencespo-lyon.fr/Signal/index.php?r=article/search&amp;SearchArticle[revueId]=1&amp;SearchArticle[dateDeb]=1984&amp;SearchArticle[dateFin]=</urldirecte>
+		<debut>1984</debut>
+		<fin></fin>
+	</service>
+	</services>
+</revue>
+</revues>
+

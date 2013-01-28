@@ -1,17 +1,25 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
+use open qw/ :std :utf8 /;
+
 use Getopt::Long;
 use C4::Context;
 use XML::Simple;
 use LWP::Simple;
 use C4::Biblio;
 use MARC::File::USMARC;
-use utf8;
 use YAML;
-use open qw/ :std :utf8 /;
+use DateTime;
 
-my $url = 'http://www.reseau-mirabel.info/rest.php?suppr';
+use FindBin;
+use lib "$FindBin::Bin";
+use Mirabel;
+
+# Services deleted since yesterday
+$from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();
+my $url = 'http://www.reseau-mirabel.info/site/service?suppr=' . $from;
 
 my $docs = get $url;
 my $xmlsimple = XML::Simple->new();

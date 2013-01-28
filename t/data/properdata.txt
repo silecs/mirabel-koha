@@ -1,0 +1,5 @@
+Intégral;texteint
+Texte Intégral;texteint
+Sommaire;som
+Indexation;index
+Résumé;resum
