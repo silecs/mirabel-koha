@@ -1,32 +1,67 @@
-texteint: 
-    field : 857
-    a: "urldirecte|urlservice"
-    b: "nom"
-    c: "acces"
-    d: "debut fin"
-    e: "couverture" 
-    3: "id"
-som:
-    field: 388
-    a: "urldirecte|urlservice"
-    b: "nom"
-    c: "acces"
-    d: "debut fin:( )"
-    e: "couverture"
-    3: "id"
-index:
-    field: 389
-    a: "urldirecte|urlservice"
-    b: "nom"
-    c: "acces"
-    d: "debut fin"
-    e: "couverture" 
-    3: "id"
-resum:
-    field: 398
-    a: "urldirecte|urlservice"
-    b: "nom"
-    c: "acces"
-    d: "debut fin"
-    e: "couverture" 
-    3: "id"
+base_url: 'http://www.reseau-mirabel.info/devel/rest.php'
+update:
+    texteint:
+        field : 857
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin"
+        e: "couverture"
+        3: "id"
+    som:
+        field: 388
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin:( )"
+        e: "couverture"
+        3: "id"
+    index:
+        field: 389
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin"
+        e: "couverture"
+        3: "id"
+    resum:
+        field: 398
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin"
+        e: "couverture"
+        3: "id"
+delete:
+    texteint:
+        field : 857
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin"
+        e: "couverture"
+        3: "id"
+    som:
+        field: 388
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin:( )"
+        e: "couverture"
+        3: "id"
+    index:
+        field: 389
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin"
+        e: "couverture"
+        3: "id"
+    resum:
+        field: 398
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin"
+        e: "couverture"
+        3: "id"

@@ -8,7 +8,10 @@ our @ISA = qw( Exporter );
 
 our $VERSION = 2.0;
 
-our @EXPORT = qw( &get_services  );
+our @EXPORT = qw(
+    &get_services
+    &getConfigPath
+);
 
 sub parse_xml {
 	my ($input) = @_;
@@ -43,6 +46,19 @@ sub get_services {
 	};
     }
     return $services;
+}
+
+sub getConfigPath {
+    # Read the koha-conf.xml and get configuration path
+    my $kohaConfFile = $ENV{'KOHA_CONF'};
+    die "Environment variables '\$KOHA_CONF' is not set.\n" unless $kohaConfFile;
+    my $xml = XML::Simple->new();
+    my $koha_conf = $xml->XMLin($kohaConfFile) ;
+
+    my $path = $koha_conf->{config}->{mirabel};
+    return $path if $path && ref($path) ne 'HASH';
+    return 0;
+
 }
 
 1;

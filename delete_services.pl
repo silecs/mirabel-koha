@@ -17,19 +17,24 @@ use FindBin;
 use lib "$FindBin::Bin";
 use Mirabel;
 
-# Services deleted since yesterday
+# Load configuration files.
+my $path = Mirabel::getConfigPath();
+die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n" unless $path;
+
+my $configfile = $path . "config.yml";
+my $config = YAML::LoadFile( $configfile );
+
+# Services deleted since yesterday.
 $from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();
-my $url = 'http://www.reseau-mirabel.info/site/service?suppr=' . $from;
+my $url = $config->{base_url} . '?suppr=' . $from;
 
 my $docs = get $url;
 my $xmlsimple = XML::Simple->new();
 my $data = $xmlsimple->XMLin($docs);
 
-#print Data::Dumper::Dumper( $data );
 my @listOfFields;
-my $configfile = "config.yml";
-my $config = YAML::LoadFile( $configfile );
-push @listOfFields, $config->{$_}->{field} for keys %$config;
+$delete = $config->{delete};
+push @listOfFields, $delete->{$_}->{field} for keys %$delete;
 
 
 # Delete non-existent services from biblio

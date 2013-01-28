@@ -30,6 +30,17 @@ GetOptions (
     'all' => \$all
 );
 
+# Load configuration files.
+my $path = Mirabel::getConfigPath();
+die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n" unless $path;
+
+my $properfile = $path . "properdata.txt";
+open my $pdfh,$properfile or die "$properfile : $!";
+my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
+
+my $configfile = $path . "config.yml";
+my $config = YAML::LoadFile( $configfile );
+
 
 if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) {
     warn "***ERROR: -n, -e, -l, can't be used together\n";
@@ -42,7 +53,7 @@ if ( $all && ( $partenaire || $issn || $issnl || $issne || $type || $acces ) ) {
     exit;
 }
 
-my $url = "http://www.reseau-mirabel.info/devel/rest.php?";
+my $url = $config->{base_url} . '?';
 
 if ( $all ) {
     $url .= "all";
@@ -56,16 +67,6 @@ if ( $all ) {
     $url .= $url ~~ /\?$/ ? "couverture=$couverture" : "&couverture=$couverture" if $couverture;
 }
 
-my $path = getConfigPath();
-die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n" unless $path;
-
-my $properfile = $path . "properdata.txt";
-open my $pdfh,$properfile or die "$properfile : $!";
-my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
-
-my $configfile = $path . "config.yml";
-my $config = YAML::LoadFile( $configfile );
-
 print "URL: $url\n";
 my $docs = get $url;
 my $data = Mirabel::parse_xml($docs);
@@ -77,7 +78,7 @@ foreach my $biblio ( @{ $data->{revue} } ) {
         next;
     }
     print "Mise à jour de la notice " . $biblio->{idpartenairerevue} . ":\n";
-    my $services = get_services( $biblio, $properdata, $config );
+    my $services = get_services( $biblio, $properdata, $config->{update} );
 
     my $record = GetMarcBiblio( $biblio->{idpartenairerevue} );
     print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
@@ -205,19 +206,6 @@ sub createField {
     }
 
     return $field;
-}
-
-sub getConfigPath {
-    # Read the koha-conf.xml and get configuration path
-    my $kohaConfFile = $ENV{'KOHA_CONF'};
-    die "Environment variables '\$KOHA_CONF' is not set.\n" unless $kohaConfFile;
-    my $xml = XML::Simple->new();
-    my $koha_conf = $xml->XMLin($kohaConfFile) ;
-
-    my $path = $koha_conf->{config}->{mirabel};
-    return $path if $path && ref($path) ne 'HASH';
-    return 0;
-
 }
 
 sub print_usage {
