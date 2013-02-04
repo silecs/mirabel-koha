@@ -25,7 +25,7 @@ my $configfile = $path . "config.yml";
 my $config = YAML::LoadFile( $configfile );
 
 # Services deleted since yesterday.
-$from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();
+my $from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();
 my $url = $config->{base_url} . '?suppr=' . $from;
 
 my $docs = get $url;
@@ -33,15 +33,15 @@ my $xmlsimple = XML::Simple->new();
 my $data = $xmlsimple->XMLin($docs);
 
 my @listOfFields;
-$delete = $config->{delete};
+my $delete = $config->{delete};
 push @listOfFields, $delete->{$_}->{field} for keys %$delete;
 
 
 # Delete non-existent services from biblio
-print "Supprime les services qui n'existent plus\n";
+print "Supprime les services qui n'existent plus. ($url)\n";
 my $biblios = get_biblios();
 my @to_del;
-push @to_del, $_ for keys %{ $data->{service} };
+push @to_del, $_ for @{ $data->{service} };
 
 foreach my $biblio ( @$biblios ) {
     my $biblionumber = $biblio->{biblionumber};
