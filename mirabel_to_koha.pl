@@ -183,8 +183,9 @@ sub createField {
 	    foreach ( @and ) {
 		$count++;
 		$value .= $others if $count > 1 && ref($service->{ $_ }) ne 'HASH'; 
-		$value .= $service->{ $_ } if ref($service->{ $_ }) ne 'HASH';
+		$value .= $service->{ $_ } . ' ' if ref($service->{ $_ }) ne 'HASH';
 	    }
+            $value =~ s/\s*$//;
 	}
 
 	unless ( $value ) {
