@@ -29,7 +29,7 @@ my $from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();
 my $url = $config->{base_url} . '?suppr=' . $from;
 
 my $docs = get $url;
-my $xmlsimple = XML::Simple->new();
+my $xmlsimple = XML::Simple->new( ForceArray => ['service'] );
 my $data = $xmlsimple->XMLin($docs);
 
 my @listOfFields;
@@ -50,15 +50,15 @@ foreach my $biblio ( @$biblios ) {
     my $countfield = 0;
     #foreach my $field ( $record->field(qw/857 388 389 398/) ) {
     foreach my $field ( $record->field(@listOfFields) ) {
-	my $id = $field->subfield('3');
-	if ( $id && in_array( \@to_del, $id) ) {
-	    $countfield++;
-	    $record->delete_field( $field );
-	}
+        my $id = $field->subfield('3');
+        if ( $id && in_array( \@to_del, $id) ) {
+            $countfield++;
+            $record->delete_field( $field );
+        }
     }
     if ( $countfield ) {
-	my $fmk = GetFrameworkCode( $biblionumber );
-	ModBiblioMarc( $record, $biblionumber, $fmk );
+        my $fmk = GetFrameworkCode( $biblionumber );
+        ModBiblioMarc( $record, $biblionumber, $fmk );
     }
     print "$biblionumber: $countfield deleted\n";
 }
