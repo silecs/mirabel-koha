@@ -91,9 +91,19 @@ perl mirabel_to_koha.pl
 -all 
 ```
 
+### Exemple
+
+Pour mettre à jour Koha avec tous les accès (libre + restreints, tous types) du partenaire d'identifiant 2 :
+
+```sh
+perl mirabel_to_koha.pl -i 2 -t tout -a tout
+```
+
+
 Services supprimés
 ------------------
 
-Le script delete_services.pl permet de supprimer les champs correspondant aux services supprimés dans Mir@bel.
-Lancé sans option, il interroge l'url : <http://www.reseau-mirabel.info/site/service?suppr> et supprime les champs correspondants aux services en se basant sur l'identifiant du service.
+Le script `delete_services.pl` permet de supprimer les champs correspondant aux services supprimés dans Mir@bel.
+
+Lancé sans option, il interroge l'url <http://www.reseau-mirabel.info/site/service?suppr> et supprime les champs correspondants aux services en se basant sur l'identifiant du service.
 
