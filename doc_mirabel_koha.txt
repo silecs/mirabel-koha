@@ -29,15 +29,17 @@ Sommaire;som
 Indexation;index 
 Résumé;resum 
 
-*** config.yml : paramétrage de la correspondance entre les balises xml fournies par le service REST et les champs et sous-champs Koha ; un champ par type de service.
+*** config.yml : paramétrage de la correspondance entre les balises xml fournies par le service REST et les champs et sous-champs Koha ; 
+un champ par type de service texte integral, sommaire, resume et indexation.
 
 texteint: 
-    field : 857 
+    field : 387 
     a: "urldirecte|urlservice" 
     b: "nom" 
     c: "acces" 
     d: "debut fin" 
-    e: "couverture" 
+    e: "selection"
+    f: "lacunaire"
     3: "id" 
 som: 
     field: 388 
@@ -45,7 +47,8 @@ som:
     b: "nom" 
     c: "acces" 
     d: "debut fin" 
-    e: "couverture" 
+    e: "selection"
+    f: "lacunaire"
     3: "id" 
 
 (Attention à la syntaxe dans le fichier yml, les espaces ont de l'importance ; ne pas mettre de tabulation à la place d'un espace)
@@ -55,7 +58,7 @@ Exécution du script
 =======================
 
 Attention l'url du service REST de Mir@bel est écrite en dur dans le script, ligne
-my $url = "http://www.reseau-mirabel.info/rest.php?";
+my $url = "http://www.reseau-mirabel.info/site/service?";
 
 Le script est exécuté avec les options en fonction des services à importer ou mettre à jour : 
 
@@ -76,5 +79,5 @@ Services supprimés
 =======================
 
 Le script delete_services.pl permet de supprimer les champs correspondant aux services supprimés dans Mir@bel.
-Lancé sans option, il interroge l'url : http://www.reseau-mirabel.info/rest.php?suppr et supprime les champs correspondants aux services en se basant sur l'identifiant du service.
+Lancé sans option, il interroge l'url : http://www.reseau-mirabel.info/site/service?suppr et supprime les champs correspondants aux services en se basant sur l'identifiant du service.
 
