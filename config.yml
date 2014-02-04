@@ -4,7 +4,8 @@ texteint:
     b: "nom"
     c: "acces"
     d: "debut fin"
-    e: "couverture" 
+    e: "selection"
+    f: "lacunaire"
     3: "id"
 som:
     field: 388
@@ -12,7 +13,8 @@ som:
     b: "nom"
     c: "acces"
     d: "debut fin:( )"
-    e: "couverture"
+    e: "selection"
+    f: "lacunaire"
     3: "id"
 index:
     field: 389
@@ -20,7 +22,8 @@ index:
     b: "nom"
     c: "acces"
     d: "debut fin"
-    e: "couverture" 
+    e: "selection"
+    f: "lacunaire"
     3: "id"
 resum:
     field: 398
@@ -28,5 +31,6 @@ resum:
     b: "nom"
     c: "acces"
     d: "debut fin"
-    e: "couverture" 
+    e: "selection"
+    f: "lacunaire"
     3: "id"
