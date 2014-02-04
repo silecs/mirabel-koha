@@ -29,7 +29,8 @@ GetOptions (
 if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) { warn "***ERROR: -n, -e, -l, can't be used together\n"; print_usage(); exit }
 if ( $all && ( $partenaire || $issn || $issnl || $issne || $type || $acces ) ) { warn "***ERROR: -all can't be used with an other option"; print_usage(); exit }
 
-my $url = "http://www.reseau-mirabel.info/devel/rest.php?";
+
+my $url = "http://www.reseau-mirabel.info/site/service?";
 
 if ( $all ) {
     $url .= "all";
