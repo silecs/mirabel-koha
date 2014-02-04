@@ -1,9 +1,10 @@
 Webservice Mir@bel pour Koha
 ============================
 
-Documentation
+Documentation 
 
-Juin 2011
+V.1 Juin 2011 - V2. Janvier 2014
+
 
 Objet du script
 ---------------
@@ -29,7 +30,7 @@ Configuration
 
 ### properdata.txt
 
-`properdata.txt` indique la correspondance entre les types de services renvoyés par le service REST et les types de services utilisés dans le script (sans espace ni caractère accentué) (ce fichier ne devrait pas être modifié)
+`properdata.txt` indique la correspondance entre les types d'accès en ligne renvoyés par le service REST et les types de services utilisés dans le script (sans espace ni caractère accentué) (ce fichier ne devrait pas être modifié)
 
 ```
 Texte Intégral;texteint 
@@ -40,8 +41,8 @@ Résumé;resum
 
 ### config.yml
 
-`config.yml` paramètre la correspondance entre les balises xml fournies par le service REST et les champs et sous-champs Koha ; 
-un champ par type de service texte integral, sommaire, resume et indexation.
+`config.yml` paramètre la correspondance entre les balises xml fournies par le service REST et les champs et sous-champs Koha ; Vous devez au préalable définir ces zones Marc dans vos grilles Marc.
+un champ par type de service : texte integral, sommaire, resume et indexation.
 
 ```yml
 texteint: 
