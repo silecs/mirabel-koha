@@ -12,8 +12,21 @@ our $VERSION = 2.0;
 
 our @EXPORT = qw(
   &get_services
-  &getConfigPath
-  );
+  &read_service_config
+  &read_data_config
+);
+
+
+my $path;
+
+sub init {
+    if (!$path) {
+        $path = get_config_path();
+        die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n"
+            unless $path;
+    }
+}
+
 
 sub parse_xml {
     my ($input) = @_;
@@ -47,8 +60,22 @@ sub get_services {
     return $services;
 }
 
-sub getConfigPath {
+sub read_service_config {
+    init();
+    my $configfile = $path . "config.yml";
+    return YAML::LoadFile( $configfile );
+}
 
+sub read_data_config {
+    init();
+    my $properfile = $path . "properdata.txt";
+    open my $pdfh, "<", $properfile or die "$properfile : $!";
+    my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
+    close $pdfh;
+    return $properdata;
+}
+
+sub get_config_path {
     # Read the koha-conf.xml and get configuration path
     my $kohaConfFile = $ENV{'KOHA_CONF'};
     die "Environment variables '\$KOHA_CONF' is not set.\n" unless $kohaConfFile;
@@ -57,7 +84,7 @@ sub getConfigPath {
 
     my $path = $koha_conf->{config}->{mirabel};
     return $path if $path && ref($path) ne 'HASH';
-    return 0;
+    return "";
 }
 
 1;

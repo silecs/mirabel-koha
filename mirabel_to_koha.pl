@@ -42,15 +42,8 @@ GetOptions (
 pod2usage(-verbose => 2) if $man;
 
 # Load configuration files.
-my $path = Mirabel::getConfigPath();
-die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n" unless $path;
-
-my $properfile = $path . "properdata.txt";
-open my $pdfh,$properfile or die "$properfile : $!";
-my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
-
-my $configfile = $path . "config.yml";
-my $config = YAML::LoadFile( $configfile );
+my $properdata = Mirabel::read_data_config();
+my $config = Mirabel::read_service_config();
 
 if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) {
     warn "***ERROR: -n, -e, -l, can't be used together\n";
