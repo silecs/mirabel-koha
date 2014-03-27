@@ -16,7 +16,7 @@ use FindBin;
 use lib "$FindBin::Bin";
 use Mirabel;
 
-my ( $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all );
+my ( $help, $man, $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all, $lacunaire, $selection, $ressource );
 
 GetOptions (
     'partenaire|p=i' => \$partenaire,
@@ -27,8 +27,11 @@ GetOptions (
     'acces|a=s' => \$acces,
     'couverture|c=s' => \$couverture,
     'delete|d' => \$delete,
-    'all' => \$all
-  );
+    'all' => \$all,
+    'paslacunaire' => \$lacunaire,
+    'passelection' => \$selection,
+    'ressource|r=s' => \$ressource,
+);
 
 # Load configuration files.
 my $path = Mirabel::getConfigPath();
@@ -64,6 +67,9 @@ if ( $all ) {
     $url .= $url ~~ /\?$/ ? "type=$type" : "&type=$type" if $type;
     $url .= $url ~~ /\?$/ ? "acces=$acces" : "&acces=$acces" if $acces;
     $url .= $url ~~ /\?$/ ? "couverture=$couverture" : "&couverture=$couverture" if $couverture;
+    $url .= $url =~ /\?$/ ? "lacunaire=$lacunaire" : "&lacunaire=0" if $lacunaire;
+    $url .= $url =~ /\?$/ ? "selection=$selection" : "&selection=0" if $selection;
+    $url .= $url =~ /\?$/ ? "ressource=$ressource" : "&ressource=$ressource" if $ressource;
 }
 
 print "URL: $url\n";
