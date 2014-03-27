@@ -9,8 +9,16 @@ V.1 Juin 2011 - V2. Janvier 2014
 Objet du script
 ---------------
 
-Le webservice interroge le service REST de Mir@bel, insère et met à jour les champs Koha correspondants aux différents services dans les notices bibliographiques ; il permet également l'effacement des champs des notices lorsque les services sont supprimés de [Mir@bel](http://www.reseau-mirabel.info/).
-Ce script met à jour des champs d'une notice existante, et ne crée pas de notices bibliographiques ; les biblionumber de Koha (identifiant des notices) doivent être saisis dans Mir@bel. Les champs et sous-champs doivent être préalablement définis dans la grille de catalogage afin que l'information ajoutée soit visible.
+Le webservice interroge le service REST de Mir@bel, insère et met à jour les
+champs Koha correspondants aux différents services dans les notices
+bibliographiques ; il permet également l'effacement des champs des notices
+lorsque les services sont supprimés de
+[Mir@bel](http://www.reseau-mirabel.info/).
+Ce script met à jour des champs d'une notice existante, et ne crée pas de
+notices bibliographiques ; les biblionumber de Koha (identifiant des notices)
+doivent être saisis dans Mir@bel.  Les champs et sous-champs doivent être
+préalablement définis dans la grille de catalogage afin que l'information
+ajoutée soit visible.
 
 Pour information sur Mi@bel : <http://www.reseau-mirabel.info/>
 
@@ -41,7 +49,8 @@ Résumé;resum
 
 ### config.yml
 
-`config.yml` paramètre la correspondance entre les balises xml fournies par le service REST et les champs et sous-champs Koha ; Vous devez au préalable définir ces zones Marc dans vos grilles Marc.
+`config.yml` paramètre la correspondance entre les balises xml fournies par le service REST et les champs et sous-champs Koha.
+Vous devez au préalable définir ces zones Marc dans vos grilles Marc.
 un champ par type de service : texte integral, sommaire, resume et indexation.
 
 ```yml
@@ -67,15 +76,11 @@ som:
 
 **Attention à la syntaxe dans le fichier yml**, les espaces ont de l'importance ; ne pas mettre de tabulation à la place d'un espace.
 
+L'URL du service REST de Mir@bel est en première ligne de `config.yml`.
+
 
 Exécution du script
 -------------------
-
-Attention l'url du service REST de Mir@bel est écrite en dur dans le script, ligne
-
-```perl
-my $url = "http://www.reseau-mirabel.info/site/service?";
-```
 
 Le script est exécuté avec les options en fonction des services à importer ou mettre à jour : 
 
