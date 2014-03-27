@@ -3,21 +3,22 @@ use Test::More tests => 19;
 use FindBin;
 use lib "$FindBin::Bin/..";
 
-use XML::Simple;
+use XML::Simple qw(:strict);
 use YAML;
+use File::Slurp;
 use Mirabel;
 
 use utf8;
-use open qw/ :std :utf8 /;
+use open qw( :encoding(UTF-8) :std );
 
 my $properfile = "data/properdata.txt";
-open my $pdfh,$properfile or die "$properfile : $!";
-my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
+my $properdata = { map { chomp; my ($key,$value) = split /;/, $_; ( $key => $value ); } read_file($properfile, binmode => ':utf8') };
 
 my $configfile = "data/config.yml";
 my $config = YAML::LoadFile( $configfile );
 
-my $data = Mirabel::parse_xml("data/mirabel-1.xml");
+my $xml = read_file("data/mirabel-1.xml", binmode => ':utf8');
+my $data = Mirabel::parse_xml($xml);
 
 ok(exists $data->{revue}, "Au moins une revue");
 
@@ -28,7 +29,7 @@ my $biblio = $revues->[0];
 cmp_ok($biblio->{idpartenairerevue}, '==', 30, "idpartenairerevue");
 cmp_ok($biblio->{issn}, 'eq', '0001-7728', "issn");
 
-my $services = get_services( $biblio, $properdata, $config );
+my $services = get_services( $biblio, $properdata, $config->{update} );
 cmp_ok(scalar @$services, '==', 3, "Services");
 
 cmp_ok($services->[0]{id}, '==', 1195, "Service 1 : id");
@@ -36,11 +37,11 @@ cmp_ok($services->[1]{id}, '==', 1844, "Service 2 : id");
 cmp_ok($services->[2]{id}, '==', 4515, "Service 3 : id");
 
 isa_ok($services->[0]{service}, "HASH");
-ok(exists $services->[0]{service}{couverture}, "Service 1 : le champ couverture existe");
+ok(exists $services->[0]{service}{selection}, "Service 1 : le champ selection doit exister");
 
-cmp_ok($services->[0]{service}{couverture}, 'eq', "", "Service 1 : couverture");
-cmp_ok($services->[1]{service}{couverture}, 'eq', "", "Service 2 : couverture");
-cmp_ok($services->[2]{service}{couverture}, 'eq', "Sélection d'articles", "Service 3 : couverture");
+cmp_ok($services->[0]{service}{lacunaire}, 'eq', "", "Service 1 : lacunaire");
+cmp_ok($services->[1]{service}{lacunaire}, 'eq', "", "Service 2 : lacunaire");
+cmp_ok($services->[2]{service}{lacunaire}, 'eq', "1", "Service 3 : lacunaire");
 
 cmp_ok($services->[0]{type}, 'eq', "som", "Service 1 : type");
 cmp_ok($services->[1]{type}, 'eq', "texteint", "Service 2 : type");
