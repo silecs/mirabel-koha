@@ -17,6 +17,9 @@ use FindBin;
 use lib "$FindBin::Bin";
 use Mirabel;
 
+# remove "experimental" warning in Perl >= 5.18
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+
 my ($man, $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all, $lacunaire, $selection, $ressource );
 
 GetOptions (
