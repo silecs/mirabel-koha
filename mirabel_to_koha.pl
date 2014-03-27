@@ -4,7 +4,8 @@ use warnings;
 use utf8;
 use open qw/ :std :utf8 /;
 
-use Getopt::Long;
+use Getopt::Long qw(:config auto_help);
+use Pod::Usage;
 use C4::Context;
 use XML::Simple;
 use LWP::Simple;
@@ -16,9 +17,10 @@ use FindBin;
 use lib "$FindBin::Bin";
 use Mirabel;
 
-my ( $help, $man, $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all, $lacunaire, $selection, $ressource );
+my ($man, $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all, $lacunaire, $selection, $ressource );
 
 GetOptions (
+    'man' => \$man,
     'partenaire|p=i' => \$partenaire,
     'issn|n=s' => \$issn,
     'issnl|l=s' => \$issnl,
@@ -33,6 +35,9 @@ GetOptions (
     'ressource|r=s' => \$ressource,
 );
 
+# Print help thanks to Pod::Usage
+pod2usage(-verbose => 2) if $man;
+
 # Load configuration files.
 my $path = Mirabel::getConfigPath();
 die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n" unless $path;
@@ -46,13 +51,11 @@ my $config = YAML::LoadFile( $configfile );
 
 if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) {
     warn "***ERROR: -n, -e, -l, can't be used together\n";
-    print_usage();
-    exit;
+    pod2usage(-verbose => 0);
 }
 if ( $all && ( $partenaire || $issn || $issnl || $issne || $type || $acces ) ) {
     warn "***ERROR: -all can't be used with an other option";
-    print_usage();
-    exit;
+    pod2usage(-verbose => 0);
 }
 
 my $url = $config->{base_url} . '?';
@@ -216,13 +219,35 @@ sub createField {
     return $field;
 }
 
-sub print_usage {
-    print "Using mirabel_to_koha :\n\n";
-    print "    -p --partenaire				Filter by partenaire number\n";
-    print "    -n --issn				Filter by issn\n";
-    print "    -l --issnl				Filter by issnl\n";
-    print "    -e --issne				Filter by issne\n";
-    print "    -t --type				Filter by type\n";
-    print "    -a --acces				Filter by acces\n";
-    print "    -h --help				Print usage\n";
-}
+__END__
+
+=head1 NAME
+
+=encoding utf8
+
+mirabel_to_koha.pl
+
+=head1 SYNOPSIS
+
+mirabel_to_koha.pl [options]
+
+ Options :
+    --help          -h
+    --man
+    --partenaire=   -p
+    --issn=         -s
+    --issnl=        -l
+    --issne=        -e
+    --type=         -t
+    --acces=        -a
+    --delete        -d
+    --all
+    --paslacunaire
+    --passelection
+    --ressource=    -r
+
+=head1 DESCRIPTION
+
+Lire B<README.md> pour des informations détaillées.
+
+=cut
