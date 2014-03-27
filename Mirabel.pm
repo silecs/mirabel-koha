@@ -70,7 +70,7 @@ sub read_data_config {
     init();
     my $properfile = $path . "properdata.txt";
     open my $pdfh, "<", $properfile or die "$properfile : $!";
-    my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
+    my $properdata = { map { chomp; next if /^\s*$/; my ($key,$value) = split /;/,$_; ( $key => $value ); } <$pdfh> };
     close $pdfh;
     return $properdata;
 }
