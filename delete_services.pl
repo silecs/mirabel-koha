@@ -36,7 +36,6 @@ my @listOfFields;
 my $delete = $config->{delete};
 push @listOfFields, $delete->{$_}->{field} for keys %$delete;
 
-
 # Delete non-existent services from biblio
 print "Supprime les services qui n'existent plus. ($url)\n";
 my $biblios = get_biblios();
@@ -48,6 +47,7 @@ foreach my $biblio ( @$biblios ) {
     my $record = GetMarcBiblio( $biblionumber );
 
     my $countfield = 0;
+
     #foreach my $field ( $record->field(qw/857 388 389 398/) ) {
     foreach my $field ( $record->field(@listOfFields) ) {
         my $id = $field->subfield('3');

@@ -28,7 +28,7 @@ GetOptions (
     'couverture|c=s' => \$couverture,
     'delete|d' => \$delete,
     'all' => \$all
-);
+  );
 
 # Load configuration files.
 my $path = Mirabel::getConfigPath();
@@ -40,7 +40,6 @@ my $properdata = { map { chomp; my ($key,$value) = split /;/,$_; ( $key => $valu
 
 my $configfile = $path . "config.yml";
 my $config = YAML::LoadFile( $configfile );
-
 
 if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) {
     warn "***ERROR: -n, -e, -l, can't be used together\n";
@@ -84,9 +83,9 @@ foreach my $biblio ( @{ $data->{revue} } ) {
     print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
 
     if ($record) {
-	my $result = import_services($biblio, $services, $record);
-	print ( $result == $biblio->{idpartenairerevue} ? "Notice modifiée avec succès\n" : "Erreur lors de la modification de la notice\n" );
-	print "===================================================================\n\n";
+        my $result = import_services($biblio, $services, $record);
+        print ( $result == $biblio->{idpartenairerevue} ? "Notice modifiée avec succès\n" : "Erreur lors de la modification de la notice\n" );
+        print "===================================================================\n\n";
     }
 }
 
@@ -97,25 +96,26 @@ foreach my $biblio ( @{ $data->{revue} } ) {
 sub import_services {
     my ($biblio, $services, $record) = @_;
     foreach my $s ( @$services ) {
-	#delete_same( $record, $todo, $service);
 
-	my $newfield = createField( $s->{todo}, $s->{service} );
-	reorder_subfields( $newfield );
+        #delete_same( $record, $todo, $service);
 
-	my $exists = 0;
-	foreach my $field ( $record->field( $s->{todo}{field} ) ) {
-	    my $f3 = $field->subfield('3');
-	    if ( $f3 && $s->{id} eq $f3 ) {
-		$exists = 1;
-		$field->replace_with($newfield);
-		print "    field " . $s->{todo}{field} . " updated\n"; 
-	    }
-	}
-	unless ( $exists ) {
-	    $record->insert_fields_ordered( $newfield );
-	    print "    field " . $s->{todo}{field} . " created\n"; 
-	}
-	print $newfield->as_formatted ."\n";
+        my $newfield = createField( $s->{todo}, $s->{service} );
+        reorder_subfields( $newfield );
+
+        my $exists = 0;
+        foreach my $field ( $record->field( $s->{todo}{field} ) ) {
+            my $f3 = $field->subfield('3');
+            if ( $f3 && $s->{id} eq $f3 ) {
+                $exists = 1;
+                $field->replace_with($newfield);
+                print "    field " . $s->{todo}{field} . " updated\n";
+            }
+        }
+        unless ( $exists ) {
+            $record->insert_fields_ordered( $newfield );
+            print "    field " . $s->{todo}{field} . " created\n";
+        }
+        print $newfield->as_formatted ."\n";
     }
     my $fmk = GetFrameworkCode( $biblio->{idpartenairerevue} );
     return ModBiblioMarc( $record, $biblio->{idpartenairerevue}, $fmk );
@@ -128,7 +128,7 @@ sub reorder_subfields {
     $field->delete_subfields();
 
     foreach my $key (sort (keys(%list))) {
-	$field->add_subfields( $key  => $list{$key} );
+        $field->add_subfields( $key  => $list{$key} );
     }
 }
 
@@ -147,7 +147,7 @@ sub delete_same {
     #}
 
     foreach my $field ( $record->field( $todo->{field} ) ) {
-	my $id = $field->subfield('3');
+        my $id = $field->subfield('3');
     }
 }
 
@@ -159,51 +159,52 @@ sub createField {
     my $fieldcreated = 0;
     foreach my $key ( keys %$todo ) {
 
-	my $serviceKey = $todo->{$key};
-	my $value;
+        my $serviceKey = $todo->{$key};
+        my $value;
 
-	# Cas des valeurs séparées par |. (ou)
-	my ($fields, $others) = split(/:/, $serviceKey);
-	$serviceKey = $fields;
-	$others ||= '';
-	$others =~ s/(^\(|)$//;
+        # Cas des valeurs séparées par |. (ou)
+        my ($fields, $others) = split(/:/, $serviceKey);
+        $serviceKey = $fields;
+        $others ||= '';
+        $others =~ s/(^\(|)$//;
 
-	my @or = split /\|/, $serviceKey;
-	if ( scalar( @or ) > 1 ) {
-	    foreach ( @or ) {
-		$value = $service->{ $_ } if $service->{ $_ } && ref($service->{ $_ }) ne 'HASH';
-		last if $value;
-	    }
-	}
+        my @or = split /\|/, $serviceKey;
+        if ( scalar( @or ) > 1 ) {
+            foreach ( @or ) {
+                $value = $service->{ $_ } if $service->{ $_ } && ref($service->{ $_ }) ne 'HASH';
+                last if $value;
+            }
+        }
 
-	# Cas des valeurs séparées par un espace. ( Concatenation )
-	my @and = split /\s/, $serviceKey;
-	if ( scalar( @and ) > 1 ) {
-	    my $count = 0;
-	    foreach ( @and ) {
-		$count++;
-		$value .= $others if $count > 1 && ref($service->{ $_ }) ne 'HASH'; 
-		$value .= $service->{ $_ } . ' ' if ref($service->{ $_ }) ne 'HASH';
-	    }
+        # Cas des valeurs séparées par un espace. ( Concatenation )
+        my @and = split /\s/, $serviceKey;
+        if ( scalar( @and ) > 1 ) {
+            my $count = 0;
+            foreach ( @and ) {
+                $count++;
+                $value .= $others if $count > 1 && ref($service->{ $_ }) ne 'HASH';
+                $value .= $service->{ $_ } . ' ' if ref($service->{ $_ }) ne 'HASH';
+            }
             $value =~ s/\s*$//;
-	}
+        }
 
-	unless ( $value ) {
-	    $value = $service->{ $serviceKey };
-	}
+        unless ( $value ) {
+            $value = $service->{ $serviceKey };
+        }
 
-	next unless $value;
-	$value =~ s/-00//g;
+        next unless $value;
+        $value =~ s/-00//g;
 
-	unless ( $key eq "field" ) {
-	    unless ( $fieldcreated ) {
-		#print "    => ( + ) Champ créé: " . $todo->{field} . "\n";
-		$field = MARC::Field->new( $todo->{field},'','', $key => $value );
-		$fieldcreated = 1;
-	    } else {
-		$field->add_subfields( $key => $value );
-	    }
-	}
+        unless ( $key eq "field" ) {
+            unless ( $fieldcreated ) {
+
+                #print "    => ( + ) Champ créé: " . $todo->{field} . "\n";
+                $field = MARC::Field->new( $todo->{field},'','', $key => $value );
+                $fieldcreated = 1;
+            } else {
+                $field->add_subfields( $key => $value );
+            }
+        }
     }
 
     return $field;
