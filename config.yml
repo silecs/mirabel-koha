@@ -1,4 +1,4 @@
-base_url: 'http://www.reseau-mirabel.info/devel/rest.php'
+base_url: 'http://www.reseau-mirabel.info/site/service'
 update:
     texteint:
         field : 857
