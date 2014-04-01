@@ -130,7 +130,7 @@ sub reorder_subfields {
     my $field = shift;
 
     my %list = map { $$_[0] => $$_[1] } ($field->subfields());
-    $field->delete_subfields();
+    $field->delete_subfield({}); // remove every subfield
 
     foreach my $key (sort (keys(%list))) {
         $field->add_subfields( $key  => $list{$key} );
