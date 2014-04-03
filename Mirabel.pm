@@ -30,6 +30,8 @@ sub init {
 
 sub parse_xml {
     my ($input) = @_;
+	die "Le XML reçu de Mirabel est vide !\n"
+        unless $input;
     my $xmlsimple = XML::Simple->new( ForceArray => [ 'revue', 'service' ], SuppressEmpty => '');
     return $xmlsimple->XMLin($input);
 }
