@@ -32,7 +32,7 @@ GetOptions (
 );
 
 # Print help thanks to Pod::Usage
-pod2usage(-verbose => 2) if $opts{man};
+pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $opts{man};
 
 # Load configuration files.
 my $config = Mirabel::read_service_config();
@@ -107,7 +107,7 @@ __END__
 
 =head1 NAME
 
-=encoding utf8
+=encoding utf-8
 
 delete_services.pl
 
@@ -138,7 +138,7 @@ Par défaut, demande à Mir@bel les accès supprimés depuis 24 heures.
 =item B<--acces-ids=>?, B<--acces=>?, B<-a> ?
 
 Utilise les id (Mir@bel) donnés en paramètre au lieu d'interroger le service Mir@bel.
-Ces identifiants sont données sous la forme I<1-100,200,300-1000>.
+Ces identifiants sont donnés sous la forme I<1-100,200,300-1000>.
 
 =item B<--depuis=>YYYY-MM-DD, B<-d> YYYY-MM-DD
 

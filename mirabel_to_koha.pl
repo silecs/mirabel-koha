@@ -39,7 +39,7 @@ GetOptions (
 );
 
 # Print help thanks to Pod::Usage
-pod2usage(-verbose => 2) if $man;
+pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $man;
 
 # Load configuration files.
 my $properdata = Mirabel::read_data_config();
