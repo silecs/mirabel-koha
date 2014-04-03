@@ -8,7 +8,6 @@ use Getopt::Long qw(:config auto_help);
 use Pod::Usage;
 use C4::Context;
 use XML::Simple;
-use LWP::Simple;
 use C4::Biblio;
 use MARC::File::USMARC;
 use YAML;
@@ -20,60 +19,51 @@ use Mirabel;
 # remove "experimental" warning in Perl >= 5.18
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-my ($man, $partenaire, $issn, $issnl, $issne, $type, $acces, $couverture, $delete, $all, $lacunaire, $selection, $ressource );
+my %opts = ();
 
 GetOptions (
-    'man' => \$man,
-    'partenaire|p=i' => \$partenaire,
-    'issn|n=s' => \$issn,
-    'issnl|l=s' => \$issnl,
-    'issne|e=s' => \$issne,
-    'type|t=s' => \$type,
-    'acces|a=s' => \$acces,
-    'couverture|c=s' => \$couverture,
-    'delete|d' => \$delete,
-    'all' => \$all,
-    'paslacunaire' => \$lacunaire,
-    'passelection' => \$selection,
-    'ressource|r=s' => \$ressource,
+    \%opts,
+    'man|manual',
+    'partenaire|p=i',
+    'issn|n=s',
+    'issnl|l=s',
+    'issne|e=s',
+    'type|t=s',
+    'acces|a=s',
+    'couverture|c=s',
+    'delete|d',
+    'all',
+    'paslacunaire|pas-lacunaire',
+    'passelection|pas-selection',
+    'ressource|r=s',
 );
+$opts{lacunaire} = !$opts{paslacunaire};
+$opts{selection} = !$opts{passelection};
 
 # Print help thanks to Pod::Usage
-pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $man;
+pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $opts{man};
 
 # Load configuration files.
 my $properdata = Mirabel::read_data_config();
 my $config = Mirabel::read_service_config();
 
-if ( ( $issn && $issnl ) || ( $issn && $issne ) || ( $issnl && $issne ) ) {
-    warn "***ERROR: -n, -e, -l, can't be used together\n";
-    pod2usage(-verbose => 0);
+if ( @opts{qw/issn issnl issne/} > 1 ) {
+    pod2usage(-verbose => 0, -message => "## ERREUR : issn, issnl, et issne sont incompatibles.\n");
 }
-if ( $all && ( $partenaire || $issn || $issnl || $issne || $type || $acces ) ) {
-    warn "***ERROR: -all can't be used with an other option";
-    pod2usage(-verbose => 0);
+if ( $opts{all} and @opts{qw/partenaire issn issnl issne type acces lacunaire selection ressource/} ) {
+    pod2usage(-verbose => 0, -message => "## ERREUR : --all est incompatible avec d'autres options.\n");
 }
 
-my $url = $config->{base_url} . '?';
-
-if ( $all ) {
-    $url .= "all";
+my %url_args = ();
+if ($opts{all}) {
+    $url_args{all} = undef;
 } else {
-    $url .= $url ~~ /\?$/ ? "partenaire=$partenaire" : "&partenaire=$partenaire" if $partenaire;
-    $url .= $url ~~ /\?$/ ? "issn=$issn" : "&issn=$issn" if $issn;
-    $url .= $url ~~ /\?$/ ? "issnl=$issnl" : "&issnl=$issnl" if $issnl;
-    $url .= $url ~~ /\?$/ ? "issne=$issne" : "&issne=$issne" if $issne;
-    $url .= $url ~~ /\?$/ ? "type=$type" : "&type=$type" if $type;
-    $url .= $url ~~ /\?$/ ? "acces=$acces" : "&acces=$acces" if $acces;
-    $url .= $url ~~ /\?$/ ? "couverture=$couverture" : "&couverture=$couverture" if $couverture;
-    $url .= $url =~ /\?$/ ? "lacunaire=$lacunaire" : "&lacunaire=0" if $lacunaire;
-    $url .= $url =~ /\?$/ ? "selection=$selection" : "&selection=0" if $selection;
-    $url .= $url =~ /\?$/ ? "ressource=$ressource" : "&ressource=$ressource" if $ressource;
+    foreach (qw/partenaire issn issnl issne type acces selection ressource couverture lacunaire selection/) {
+        $url_args{$_} = $opts{$_} if $opts{$_};
+    }
 }
 
-print "URL: $url\n";
-my $docs = get $url;
-my $data = Mirabel::parse_xml($docs);
+my $data = Mirabel::query_webservice($config->{base_url}, \%url_args);
 
 $| = 1;
 foreach my $biblio ( @{ $data->{revue} } ) {
@@ -238,8 +228,8 @@ mirabel_to_koha.pl [options]
     --acces=        -a
     --delete        -d
     --all
-    --paslacunaire
-    --passelection
+    --pas-lacunaire
+    --pas-selection
     --ressource=    -r
 
 =head1 DESCRIPTION

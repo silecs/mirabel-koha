@@ -1,5 +1,7 @@
 package Mirabel;
 
+use LWP::UserAgent;
+use URI;
 use XML::Simple;
 use utf8;
 use open qw( :encoding(UTF-8) :std );
@@ -11,6 +13,7 @@ our @ISA = qw( Exporter );
 our $VERSION = 2.0;
 
 our @EXPORT = qw(
+  &query_webservice
   &get_services
   &read_service_config
   &read_data_config
@@ -27,6 +30,21 @@ sub init {
     }
 }
 
+
+sub query_webservice {
+    my ($url, $url_args) = @_;
+
+    my $ua = LWP::UserAgent->new;
+    my $full_url = URI->new($url);
+    $full_url->query_form($url_args);
+    print "URL : $full_url\n";
+    my $response = $ua->get($full_url);
+    if ($response->is_success) {
+        return parse_xml($response->decoded_content);
+    } else {
+        die "L'interrogation du webservice Mirabel a échoué : " . $response->status_line;
+    }
+}
 
 sub parse_xml {
     my ($input) = @_;
