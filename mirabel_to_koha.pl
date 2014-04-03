@@ -36,6 +36,7 @@ GetOptions (
     'paslacunaire|pas-lacunaire',
     'passelection|pas-selection',
     'ressource|r=s',
+    'simulation|dry-run|dryrun',
 );
 $opts{lacunaire} = !$opts{paslacunaire};
 $opts{selection} = !$opts{passelection};
@@ -72,12 +73,12 @@ foreach my $biblio ( @{ $data->{revue} } ) {
         next;
     }
     print "Mise à jour de la notice " . $biblio->{idpartenairerevue} . ":\n";
-    my $services = get_services( $biblio, $properdata, $config->{update} );
+    my $services = Mirabel::get_services( $biblio, $properdata, $config->{update} );
 
     my $record = GetMarcBiblio( $biblio->{idpartenairerevue} );
     print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
 
-    if ($record) {
+    if ($record and !$opts{simulation}) {
         my $result = import_services($biblio, $services, $record);
         print ( $result == $biblio->{idpartenairerevue} ? "Notice modifiée avec succès\n" : "Erreur lors de la modification de la notice\n" );
         print "===================================================================\n\n";
@@ -231,6 +232,7 @@ mirabel_to_koha.pl [options]
     --pas-lacunaire
     --pas-selection
     --ressource=    -r
+    --simulation
 
 =head1 DESCRIPTION
 
