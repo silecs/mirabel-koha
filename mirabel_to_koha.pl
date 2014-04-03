@@ -48,10 +48,10 @@ pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $opts{man};
 my $properdata = Mirabel::read_data_config();
 my $config = Mirabel::read_service_config();
 
-if ( @opts{qw/issn issnl issne/} > 1 ) {
+if ( (grep {defined} @opts{qw/issn issnl issne/}) > 1 ) {
     pod2usage(-verbose => 0, -message => "## ERREUR : issn, issnl, et issne sont incompatibles.\n");
 }
-if ( $opts{all} and @opts{qw/partenaire issn issnl issne type acces lacunaire selection ressource/} ) {
+if ( $opts{all} and (grep {defined} @opts{qw/partenaire issn issnl issne type acces lacunaire selection ressource/}) ) {
     pod2usage(-verbose => 0, -message => "## ERREUR : --all est incompatible avec d'autres options.\n");
 }
 
