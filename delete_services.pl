@@ -73,33 +73,29 @@ foreach my $biblio ( @$biblios ) {
     my $record = GetMarcBiblio( $biblionumber );
 
     my $countfield = 0;
+    my @fields_to_delete = ();
 
-    #foreach my $field ( $record->field(qw/857 388 389 398/) ) {
     foreach my $field ( $record->field(@listOfFields) ) {
         my $id = $field->subfield('3');
         if ( $id and exists $to_del{$id} ) {
-            $countfield++;
             if ($opts{simulation}) {
-                printf("* biblionumber=$biblionumber\n") if ($countfield == 1);
-                printf "    %4d. subfield('3')=$id\n", $countfield;
+                print "* biblionumber=$biblionumber : subfield('3')=$id\n";
             } else {
-                $record->delete_field( $field );
+                push @fields_to_delete, $field;
             }
         }
     }
-    if ( $countfield and !$opts{simulation} ) {
-        my $fmk = GetFrameworkCode( $biblionumber );
-        ModBiblioMarc( $record, $biblionumber, $fmk );
-    }
-    if ($countfield) {
-        print "    $biblionumber: $countfield deleted\n";
+    if ( @fields_to_delete ) {
+        $record->delete_fields( @fields_to_delete );
+        ModBiblioMarc( $record, $biblionumber, GetFrameworkCode($biblionumber) );
+        printf "    $biblionumber: %d deleted\n", scalar(@fields_to_delete);
     }
 }
 print "Terminé\n";
 
 sub get_biblios {
     my $dbh = C4::Context->dbh;
-    my $query = "SELECT biblionumber from biblio";
+    my $query = "SELECT biblionumber FROM biblio";
     my $sth = $dbh->prepare($query);
     $sth->execute();
     my $result = $sth->fetchall_arrayref({});
