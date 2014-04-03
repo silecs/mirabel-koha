@@ -39,6 +39,7 @@ my $config = Mirabel::read_service_config();
 
 my @listOfFields;
 push @listOfFields, $config->{delete}{$_}{field} for keys %{$config->{delete}};
+warn "Champs à supprimer dans Koha : ", join(", ", sort {$a <=> $b} @listOfFields), "\n";
 
 my $biblios = get_biblios();
 
@@ -79,8 +80,8 @@ foreach my $biblio ( @$biblios ) {
         if ( $id and exists $to_del{$id} ) {
             $countfield++;
             if ($opts{simulation}) {
-                printf("* %s\n", $record->title()) if ($countfield == 1);
-                printf "    %4d. $id\n", $countfield;
+                printf("* biblionumber=$biblionumber\n") if ($countfield == 1);
+                printf "    %4d. subfield('3')=$id\n", $countfield;
             } else {
                 $record->delete_field( $field );
             }
@@ -91,7 +92,7 @@ foreach my $biblio ( @$biblios ) {
         ModBiblioMarc( $record, $biblionumber, $fmk );
     }
     if ($countfield) {
-        print "$biblionumber: $countfield deleted\n";
+        print "    $biblionumber: $countfield deleted\n";
     }
 }
 print "Terminé\n";
