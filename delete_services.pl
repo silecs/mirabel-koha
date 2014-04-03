@@ -28,6 +28,7 @@ GetOptions (
     'man',
     'acces|acces-ids|accesids|a=s',
     'depuis|since|d=s',
+    'simulation|dry-run|dryrun',
 );
 
 # Print help thanks to Pod::Usage
@@ -76,10 +77,15 @@ foreach my $biblio ( @$biblios ) {
         my $id = $field->subfield('3');
         if ( $id && in_array( \@to_del, $id) ) {
             $countfield++;
-            $record->delete_field( $field );
+            if ($opts{simulation}) {
+                printf("* %s\n", $record->title()) if ($countfield == 1);
+                printf "    %4d. $id\n", $countfield;
+            } else {
+                $record->delete_field( $field );
+            }
         }
     }
-    if ( $countfield ) {
+    if ( $countfield and !$opts{simulation} ) {
         my $fmk = GetFrameworkCode( $biblionumber );
         ModBiblioMarc( $record, $biblionumber, $fmk );
     }
@@ -113,9 +119,9 @@ delete_services.pl
 
 =head1 SYNOPSIS
 
-delete_services.pl [--depuis=YYYY-MM-DD]
+delete_services.pl [--depuis=YYYY-MM-DD] [--simulation]
 
-delete_services.pl --acces-ids=1-6000
+delete_services.pl --acces-ids=1-6000 [--simulation]
 
 Supprime des déclarations d'accès en ligne dans Koha
 (champ I<field> du fichier I<config.yml>),
@@ -129,6 +135,7 @@ Par défaut, demande à Mir@bel les accès supprimés depuis 24 heures.
     --man
     --acces-ids=    -a
     --depuis=       -d
+    --simulation
 
 =head1 DESCRIPTION
 
@@ -143,6 +150,10 @@ Ces identifiants sont données sous la forme I<1-100,200,300-1000>.
 
 Lorsque le webservice de Mir@bel est interrogé, il transmet les accès supprimés
 entre maintenant et cette date (par défaut, 24 h auparavant).
+
+=item B<--simulation>, B<--dry-run>
+
+Ne supprime rien, affiche la liste des suppressions prévues.
 
 =back
 
