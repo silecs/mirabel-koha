@@ -83,12 +83,14 @@ sub get_config_path {
     die "Environment variables '\$KOHA_CONF' is not set.\n" unless $kohaConfFile;
     my $xml = XML::Simple->new();
     my $koha_conf = $xml->XMLin($kohaConfFile) ;
+    warn "Config Koha : $kohaConfFile\n";
 
     my $path = $koha_conf->{config}->{mirabel};
     if ($path && ref($path) ne 'HASH') {
         if (-f $path) {
             $path =~ s{/[^/]+?$}{/}; # TODO: use a proper dirname() function
         }
+        warn "Config Mirabel (config.yml et properdata.txt) lue dans $path\n";
         return $path;
     }
     warn "Le chemin vers les fichiers de configuration pour Mirabel n'est pas valide dans la config Koha.\n";
