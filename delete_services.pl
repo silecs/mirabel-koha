@@ -4,7 +4,8 @@ use warnings;
 use utf8;
 use open qw/ :std :utf8 /;
 
-use Getopt::Long;
+use Getopt::Long qw(:config auto_help);
+use Pod::Usage;
 use C4::Context;
 use XML::Simple;
 use LWP::Simple;
@@ -17,30 +18,52 @@ use FindBin;
 use lib "$FindBin::Bin";
 use Mirabel;
 
+my %opts = (
+    "acces-ids" => "",
+    "depuis" => DateTime->from_epoch(epoch => time()-3600*24)->ymd(),
+);
+
+GetOptions (
+    \%opts,
+    'man',
+    'acces|acces-ids|accesids|a=s',
+    'depuis|since|d=s',
+);
+
+# Print help thanks to Pod::Usage
+pod2usage(-verbose => 2) if $opts{man};
+
 # Load configuration files.
-my $path = Mirabel::getConfigPath();
-die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n" unless $path;
-
-my $configfile = $path . "config.yml";
-my $config = YAML::LoadFile( $configfile );
-
-# Services deleted since yesterday.
-my $from = DateTime->from_epoch(epoch => time()-3600*24)->ymd();
-my $url = $config->{base_url} . '?suppr=' . $from;
-
-my $docs = get $url;
-my $xmlsimple = XML::Simple->new( ForceArray => ['service'] );
-my $data = $xmlsimple->XMLin($docs);
+my $config = Mirabel::read_service_config();
 
 my @listOfFields;
-my $delete = $config->{delete};
-push @listOfFields, $delete->{$_}->{field} for keys %$delete;
+push @listOfFields, $config->{delete}{$_}{field} for keys %{$config->{delete}};
 
-# Delete non-existent services from biblio
-print "Supprime les services qui n'existent plus. ($url)\n";
 my $biblios = get_biblios();
+
 my @to_del;
-push @to_del, $_ for @{ $data->{service} };
+if ($opts{acces}) {
+    foreach (split /,/, $opts{acces}) {
+        my ($start, $end) = split /\-/;
+        if ($end) {
+            die "Invalid list of ID" if ($end < $start);
+            push @to_del, ($start .. $end);
+        } else {
+            push @to_del, $start;
+        }
+    }
+} else {
+    # Services deleted since yesterday.
+    my $url = $config->{base_url} . '?suppr=' . $opts{depuis};
+
+    my $docs = get $url;
+    my $xmlsimple = XML::Simple->new( ForceArray => ['service'] );
+    my $data = $xmlsimple->XMLin($docs);
+
+    # Delete non-existent services from biblio
+    print "Supprime les services qui n'existent plus. ($url)\n";
+    push @to_del, $_ for @{ $data->{service} };
+}
 
 foreach my $biblio ( @$biblios ) {
     my $biblionumber = $biblio->{biblionumber};
@@ -79,3 +102,48 @@ sub in_array {
     return (exists($items{$search_for}))?1:0;
 }
 
+
+__END__
+
+=head1 NAME
+
+=encoding utf8
+
+delete_services.pl
+
+=head1 SYNOPSIS
+
+delete_services.pl [--depuis=YYYY-MM-DD]
+
+delete_services.pl --acces-ids=1-6000
+
+Supprime des déclarations d'accès en ligne dans Koha
+(champ I<field> du fichier I<config.yml>),
+soit en interrogeant le webservice Mir@bel pour connaître les accès supprimés,
+soit en utilisant des identifiants donnés en paramètre.
+
+Par défaut, demande à Mir@bel les accès supprimés depuis 24 heures.
+
+ Options :
+    --help          -h
+    --man
+    --acces-ids=    -a
+    --depuis=       -d
+
+=head1 DESCRIPTION
+
+=over 8
+
+=item B<--acces-ids=>?, B<--acces=>?, B<-a> ?
+
+Utilise les id (Mir@bel) donnés en paramètre au lieu d'interroger le service Mir@bel.
+Ces identifiants sont données sous la forme I<1-100,200,300-1000>.
+
+=item B<--depuis=>YYYY-MM-DD, B<-d> YYYY-MM-DD
+
+Lorsque le webservice de Mir@bel est interrogé, il transmet les accès supprimés
+entre maintenant et cette date (par défaut, 24 h auparavant).
+
+=back
+
+=cut
