@@ -65,6 +65,7 @@ if ($opts{acces}) {
     print "Supprime les services qui n'existent plus. ($url)\n";
     push @to_del, $_ for @{ $data->{service} };
 }
+my %to_del = map {$_ => 1} @to_del;
 
 foreach my $biblio ( @$biblios ) {
     my $biblionumber = $biblio->{biblionumber};
@@ -75,7 +76,7 @@ foreach my $biblio ( @$biblios ) {
     #foreach my $field ( $record->field(qw/857 388 389 398/) ) {
     foreach my $field ( $record->field(@listOfFields) ) {
         my $id = $field->subfield('3');
-        if ( $id && in_array( \@to_del, $id) ) {
+        if ( $id and exists $to_del{$id} ) {
             $countfield++;
             if ($opts{simulation}) {
                 printf("* %s\n", $record->title()) if ($countfield == 1);
@@ -89,7 +90,9 @@ foreach my $biblio ( @$biblios ) {
         my $fmk = GetFrameworkCode( $biblionumber );
         ModBiblioMarc( $record, $biblionumber, $fmk );
     }
-    print "$biblionumber: $countfield deleted\n";
+    if ($countfield) {
+        print "$biblionumber: $countfield deleted\n";
+    }
 }
 print "Terminé\n";
 
@@ -100,12 +103,6 @@ sub get_biblios {
     $sth->execute();
     my $result = $sth->fetchall_arrayref({});
     return $result;
-}
-
-sub in_array {
-    my ($arr,$search_for) = @_;
-    my %items = map {$_ => 1} @$arr;
-    return (exists($items{$search_for}))?1:0;
 }
 
 
