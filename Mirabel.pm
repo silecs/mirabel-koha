@@ -83,7 +83,13 @@ sub get_config_path {
     my $koha_conf = $xml->XMLin($kohaConfFile) ;
 
     my $path = $koha_conf->{config}->{mirabel};
-    return $path if $path && ref($path) ne 'HASH';
+    if ($path && ref($path) ne 'HASH') {
+        if (-f $path) {
+            $path =~ s{/[^/]+?$}{/}; # TODO: use a proper dirname() function
+        }
+        return $path;
+    }
+    warn "Le chemin vers les fichiers de configuration pour Mirabel n'est pas valide dans la config Koha.\n";
     return "";
 }
 
