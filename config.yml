@@ -10,6 +10,7 @@ update:
         #  * un champ du webservice Mir@bel ("acces")
         #  * alternatives ("urldirecte|urlservice" : si "urldirecte" est vide, alors "urlservice")
         #  * concaténation ("debut fin" : champs "debut" concaténé avec "fin" et un espace de séparation)
+        #  * filtre "periode" ou "dates" ("debut fin :(periode)" appliquera le filtre "periode" aux 2 dates)
         a: "urldirecte|urlservice"
         b: "nom"
         c: "acces"

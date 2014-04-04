@@ -39,10 +39,11 @@ sub build_service_value {
 
         my $value;
 
-        my ($fields, $others) = split(/:/, $serviceKey);
-        $serviceKey = $fields;
-        $others ||= '';
-        $others =~ s/(^\(|)$//;
+        my $filter;
+        if ($serviceKey =~ s/\s*:\((\w+)\)\s*$//) {
+            $filter = "filter_value_" . $1;
+            $filter = (exists &{$filter}) ? \&{$filter} : "";
+        }
 
         # Cas des valeurs séparées par |. (ou)
         my @or = split /\|/, $serviceKey;
@@ -53,16 +54,11 @@ sub build_service_value {
             }
         }
 
-        # Cas des valeurs séparées par un espace. ( Concatenation )
+        # Cas des valeurs séparées par un espace.
         my @and = split /\s/, $serviceKey;
         if ( scalar( @and ) > 1 ) {
-            my $count = 0;
-            foreach ( @and ) {
-                $count++;
-                $value .= $others if $count > 1 && ref($service->{ $_ }) ne 'HASH';
-                $value .= $service->{ $_ } . ' ' if ref($service->{ $_ }) ne 'HASH';
-            }
-            $value =~ s/\s*$//;
+            my @subvalues = map { (ref($service->{ $_ }) eq 'HASH') ? "" : $service->{ $_ } } @and;
+            $value = $filter ? &$filter(@subvalues) : join(" ", grep {!/^$/} @subvalues);
         }
 
         unless ( $value ) {
@@ -72,6 +68,23 @@ sub build_service_value {
             $value =~ s/-00//g;
         }
         return $value;
+}
+
+sub filter_value_dates {
+    return join(" ", map { $a = $_; $a =~ s/-00//g; $a; } @_);
+}
+
+sub filter_value_periode {
+    my ($deb, $fin) = map { $a = $_; $a =~ s/-00//g; $a; } @_;
+    if ($deb and $fin) {
+        return "$deb à $fin";
+    } elsif ($deb and !$fin) {
+        return "Depuis $deb";
+    } elsif (!$deb and $fin) {
+        return "Jusqu'à $fin";
+    } else {
+        return "";
+    }
 }
 
 sub query_webservice {
