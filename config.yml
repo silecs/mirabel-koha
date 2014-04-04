@@ -18,8 +18,7 @@ update:
         b: "nom"
         c: "acces"
         d: "debut fin :(periode)"
-        e: "selection"
-        f: "lacunaire"
+        e: "couverture"
         3: "id"
     som:
         field: 388
@@ -27,8 +26,7 @@ update:
         b: "nom"
         c: "acces"
         d: "debut fin :(periode)"
-        e: "selection"
-        f: "lacunaire"
+        e: "couverture"
         3: "id"
     index:
         field: 389
@@ -36,8 +34,7 @@ update:
         b: "nom"
         c: "acces"
         d: "debut fin :(periode)"
-        e: "selection"
-        f: "lacunaire"
+        e: "couverture"
         3: "id"
     resum:
         field: 398
@@ -45,8 +42,7 @@ update:
         b: "nom"
         c: "acces"
         d: "debut fin :(periode)"
-        e: "selection"
-        f: "lacunaire"
+        e: "couverture"
         3: "id"
 # Configuration pour la suppression (delete-services.pl)
 # Idem "update", mais seules les lignes "field: ?" sont utilisées.
