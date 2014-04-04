@@ -40,7 +40,9 @@ GetOptions (
     'all',
     'paslacunaire|pas-lacunaire',
     'passelection|pas-selection',
+    'revue=s',
     'ressource|r=s',
+    'mesressources',
     'simulation|dry-run|dryrun',
 );
 $opts{lacunaire} = !$opts{paslacunaire};
@@ -65,7 +67,7 @@ my %url_args = ();
 if ($opts{all}) {
     $url_args{all} = undef;
 } else {
-    foreach (qw/partenaire issn issnl issne type acces selection ressource couverture lacunaire selection/) {
+    foreach (qw/partenaire issn issnl issne type acces selection revue ressource mesressources lacunaire selection/) {
         $url_args{$_} = $opts{$_} if $opts{$_};
     }
 }
@@ -193,17 +195,18 @@ mirabel_to_koha.pl [options]
     --help          -h
     --man
 
-    --partenaire=   -p
-    --issn=         -s
-    --issnl=        -l
-    --issne=        -e
-    --type=         -t
-    --acces=        -a
-    --delete        -d
+    --partenaire=   -p   Identifiant numérique du partenaire
+    --issn=         -s   ISSN
+    --issnl=        -l   ISSNl
+    --issne=        -e   ISSNe
+    --type=         -t   Type, parmi (texte ; sommaire ; resume ; indexation ; tout)
+    --acces=        -a   Accès, parmi (libre ; restreint ; tout)
     --all
-    --pas-lacunaire
-    --pas-selection
-    --ressource=    -r
+    --pas-lacunaire      Exclut les accès lacunaires (certains numéros manquent)
+    --pas-selection      Exclut les accès sélections (certains articles manquent)
+    --revue=             Seulement les accès de la revue : liste d'ID séparés par ","
+    --ressource=    -r   Seulement les accès de la ressource : liste d'ID séparés par ","
+    --mesressources      Seulement pour les ressources suivies par ce partenaire
 
     --simulation
     --config=
