@@ -25,7 +25,7 @@ my $path;
 
 sub init {
     if (!$path) {
-        $path = get_config_path();
+        $path = get_config_path(@_);
         die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n"
             unless $path;
     }
@@ -153,23 +153,33 @@ sub read_data_config {
 
 # private function
 sub get_config_path {
-    # Read the koha-conf.xml and get configuration path
-    my $kohaConfFile = $ENV{'KOHA_CONF'};
-    die "Environment variables '\$KOHA_CONF' is not set.\n" unless $kohaConfFile;
-    my $xml = XML::Simple->new();
-    my $koha_conf = $xml->XMLin($kohaConfFile) ;
-    warn "Config Koha : $kohaConfFile\n";
+    my $kohaConfFile = shift;
+    $path = shift;
 
-    my $path = $koha_conf->{config}->{mirabel};
-    if ($path && ref($path) ne 'HASH') {
-        if (-f $path) {
-            $path =~ s{/[^/]+?$}{/}; # TODO: use a proper dirname() function
+    if (!$path) {
+        if (!$kohaConfFile) {
+            # Read the koha-conf.xml and get configuration path
+            $kohaConfFile = $ENV{'KOHA_CONF'};
+            die "Environment variable '\$KOHA_CONF' is not set, and no parameter --config-koha.\n" unless $kohaConfFile;
         }
-        warn "Config Mirabel (config.yml et properdata.txt) lue dans $path\n";
-        return $path;
+        die("$kohaConfFile est introuvable.\n") unless -f $kohaConfFile;
+        my $xml = XML::Simple->new();
+        my $koha_conf = $xml->XMLin($kohaConfFile) ;
+        warn "Config Koha : $kohaConfFile\n";
+
+        $path = $koha_conf->{config}->{mirabel};
+        if ($path && ref($path) ne 'HASH') {
+            if (-f $path) {
+                $path =~ s{/[^/]+?$}{/}; # TODO: use a proper dirname() function
+            }
+        }
     }
-    warn "Le chemin vers les fichiers de configuration pour Mirabel n'est pas valide dans la config Koha.\n";
-    return "";
+    $path =~ s{([^/])$}{$1/}; # add trailing /
+    die "Le chemin vers les fichiers de configuration pour Mirabel n'est pas un répertoire valide : $path\n"
+        unless (-d $path and -r "${path}config.yml" and -r "${path}properdata.txt");
+
+    warn "Config Mirabel (config.yml et properdata.txt) lue dans $path\n";
+    return $path;
 }
 
 1;

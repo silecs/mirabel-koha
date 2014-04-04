@@ -19,11 +19,16 @@ use Mirabel;
 # remove "experimental" warning in Perl >= 5.18
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-my %opts = ();
+my %opts = (
+    'config' => '',
+    'configkoha' => '',
+);
 
 GetOptions (
     \%opts,
     'man|manual',
+    'config=s',
+    'configkoha|config-koha=s',
     'partenaire|p=i',
     'issn|n=s',
     'issnl|l=s',
@@ -45,6 +50,7 @@ $opts{selection} = !$opts{passelection};
 pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $opts{man};
 
 # Load configuration files.
+Mirabel::init(@opts{qw/configkoha config/});
 my $properdata = Mirabel::read_data_config();
 my $config = Mirabel::read_service_config();
 
@@ -186,6 +192,7 @@ mirabel_to_koha.pl [options]
  Options :
     --help          -h
     --man
+
     --partenaire=   -p
     --issn=         -s
     --issnl=        -l
@@ -197,7 +204,10 @@ mirabel_to_koha.pl [options]
     --pas-lacunaire
     --pas-selection
     --ressource=    -r
+
     --simulation
+    --config=
+    --config-koha=
 
 =head1 DESCRIPTION
 
