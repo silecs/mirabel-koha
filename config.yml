@@ -5,16 +5,19 @@ base_url: 'http://www.reseau-mirabel.info/site/service'
 update:
     # Type d'accès (cf properdata.txt pour la liste des types)
     texteint:
-        field : 857
-        # les valeurs peuvent être :
+        field: 857
+        # Les clés seront les noms des attributs de Koha pour ce champ (857.a etc).
+        # Les valeurs peuvent être :
+        #
         #  * un champ du webservice Mir@bel ("acces")
         #  * alternatives ("urldirecte|urlservice" : si "urldirecte" est vide, alors "urlservice")
-        #  * concaténation ("debut fin" : champs "debut" concaténé avec "fin" et un espace de séparation)
-        #  * filtre "periode" ou "dates" ("debut fin :(periode)" appliquera le filtre "periode" aux 2 dates)
+        #  * concaténation ("debut fin" : champs "debut" concaténé avec "fin" via un espace de séparation)
+        #  * concaténation par un filtre "periode" ou "dates" ("debut fin :(periode)" appliquera le filtre "periode" aux 2 dates)
+        #
         a: "urldirecte|urlservice"
         b: "nom"
         c: "acces"
-        d: "debut fin"
+        d: "debut fin :(periode)"
         e: "selection"
         f: "lacunaire"
         3: "id"
@@ -23,7 +26,7 @@ update:
         a: "urldirecte|urlservice"
         b: "nom"
         c: "acces"
-        d: "debut fin:( )"
+        d: "debut fin :(periode)"
         e: "selection"
         f: "lacunaire"
         3: "id"
@@ -32,7 +35,7 @@ update:
         a: "urldirecte|urlservice"
         b: "nom"
         c: "acces"
-        d: "debut fin"
+        d: "debut fin :(periode)"
         e: "selection"
         f: "lacunaire"
         3: "id"
@@ -41,46 +44,18 @@ update:
         a: "urldirecte|urlservice"
         b: "nom"
         c: "acces"
-        d: "debut fin"
+        d: "debut fin :(periode)"
         e: "selection"
         f: "lacunaire"
         3: "id"
 # Configuration pour la suppression (delete-services.pl)
-# Seuls les lignes "field" sont utilisées.
+# Idem "update", mais seules les lignes "field: ?" sont utilisées.
 delete:
     texteint:
-        field : 857
-        a: "urldirecte|urlservice"
-        b: "nom"
-        c: "acces"
-        d: "debut fin"
-        e: "selection"
-        f: "lacunaire"
-        3: "id"
+        field: 857
     som:
         field: 388
-        a: "urldirecte|urlservice"
-        b: "nom"
-        c: "acces"
-        d: "debut fin:( )"
-        e: "selection"
-        f: "lacunaire"
-        3: "id"
     index:
         field: 389
-        a: "urldirecte|urlservice"
-        b: "nom"
-        c: "acces"
-        d: "debut fin"
-        e: "selection"
-        f: "lacunaire"
-        3: "id"
     resum:
         field: 398
-        a: "urldirecte|urlservice"
-        b: "nom"
-        c: "acces"
-        d: "debut fin"
-        e: "selection"
-        f: "lacunaire"
-        3: "id"
