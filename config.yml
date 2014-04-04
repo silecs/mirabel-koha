@@ -1,7 +1,15 @@
+# URL d'accès au webservice de Mir@bel
 base_url: 'http://www.reseau-mirabel.info/site/service'
+#
+# Configuration pour l'ajout et la modification
 update:
+    # Type d'accès (cf properdata.txt pour la liste des types)
     texteint:
         field : 857
+        # les valeurs peuvent être :
+        #  * un champ du webservice Mir@bel ("acces")
+        #  * alternatives ("urldirecte|urlservice" : si "urldirecte" est vide, alors "urlservice")
+        #  * concaténation ("debut fin" : champs "debut" concaténé avec "fin" et un espace de séparation)
         a: "urldirecte|urlservice"
         b: "nom"
         c: "acces"
@@ -36,6 +44,8 @@ update:
         e: "selection"
         f: "lacunaire"
         3: "id"
+# Configuration pour la suppression (delete-services.pl)
+# Seuls les lignes "field" sont utilisées.
 delete:
     texteint:
         field : 857
