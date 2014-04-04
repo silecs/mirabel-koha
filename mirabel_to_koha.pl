@@ -35,8 +35,6 @@ GetOptions (
     'issne|e=s',
     'type|t=s',
     'acces|a=s',
-    'couverture|c=s',
-    'delete|d',
     'all',
     'paslacunaire|pas-lacunaire',
     'passelection|pas-selection',
