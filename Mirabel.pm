@@ -17,6 +17,7 @@ our @EXPORT = qw(
   &get_services
   &read_service_config
   &read_data_config
+  &build_service_value
 );
 
 
@@ -30,6 +31,48 @@ sub init {
     }
 }
 
+
+
+sub build_service_value {
+        my $serviceKey = shift;
+        my $service = shift;
+
+        my $value;
+
+        my ($fields, $others) = split(/:/, $serviceKey);
+        $serviceKey = $fields;
+        $others ||= '';
+        $others =~ s/(^\(|)$//;
+
+        # Cas des valeurs séparées par |. (ou)
+        my @or = split /\|/, $serviceKey;
+        if ( scalar( @or ) > 1 ) {
+            foreach ( @or ) {
+                $value = $service->{ $_ } if $service->{ $_ } && ref($service->{ $_ }) ne 'HASH';
+                last if $value;
+            }
+        }
+
+        # Cas des valeurs séparées par un espace. ( Concatenation )
+        my @and = split /\s/, $serviceKey;
+        if ( scalar( @and ) > 1 ) {
+            my $count = 0;
+            foreach ( @and ) {
+                $count++;
+                $value .= $others if $count > 1 && ref($service->{ $_ }) ne 'HASH';
+                $value .= $service->{ $_ } . ' ' if ref($service->{ $_ }) ne 'HASH';
+            }
+            $value =~ s/\s*$//;
+        }
+
+        unless ( $value ) {
+            $value = $service->{ $serviceKey };
+        }
+        if ($value) {
+            $value =~ s/-00//g;
+        }
+        return $value;
+}
 
 sub query_webservice {
     my ($url, $url_args) = @_;
@@ -95,6 +138,7 @@ sub read_data_config {
     return $properdata;
 }
 
+# private function
 sub get_config_path {
     # Read the koha-conf.xml and get configuration path
     my $kohaConfFile = $ENV{'KOHA_CONF'};

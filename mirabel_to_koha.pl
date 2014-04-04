@@ -154,51 +154,16 @@ sub createField {
     my $field;
     my $fieldcreated = 0;
     foreach my $key ( keys %$todo ) {
-
-        my $serviceKey = $todo->{$key};
-        my $value;
-
-        # Cas des valeurs séparées par |. (ou)
-        my ($fields, $others) = split(/:/, $serviceKey);
-        $serviceKey = $fields;
-        $others ||= '';
-        $others =~ s/(^\(|)$//;
-
-        my @or = split /\|/, $serviceKey;
-        if ( scalar( @or ) > 1 ) {
-            foreach ( @or ) {
-                $value = $service->{ $_ } if $service->{ $_ } && ref($service->{ $_ }) ne 'HASH';
-                last if $value;
-            }
-        }
-
-        # Cas des valeurs séparées par un espace. ( Concatenation )
-        my @and = split /\s/, $serviceKey;
-        if ( scalar( @and ) > 1 ) {
-            my $count = 0;
-            foreach ( @and ) {
-                $count++;
-                $value .= $others if $count > 1 && ref($service->{ $_ }) ne 'HASH';
-                $value .= $service->{ $_ } . ' ' if ref($service->{ $_ }) ne 'HASH';
-            }
-            $value =~ s/\s*$//;
-        }
-
-        unless ( $value ) {
-            $value = $service->{ $serviceKey };
-        }
-
+        my $value = build_service_value($todo->{$key}, $service);
         next unless $value;
-        $value =~ s/-00//g;
 
-        unless ( $key eq "field" ) {
-            unless ( $fieldcreated ) {
-
+        if ( $key ne "field" ) {
+            if ( $fieldcreated ) {
+                $field->add_subfields( $key => $value );
+            } else {
                 #print "    => ( + ) Champ créé: " . $todo->{field} . "\n";
                 $field = MARC::Field->new( $todo->{field},'','', $key => $value );
                 $fieldcreated = 1;
-            } else {
-                $field->add_subfields( $key => $value );
             }
         }
     }
