@@ -104,10 +104,12 @@ sub query_webservice {
 
 sub parse_xml {
     my ($input) = @_;
-	die "Le XML reçu de Mirabel est vide !\n"
+    die "Le XML reçu de Mirabel est vide !\n"
         unless $input;
     my $xmlsimple = XML::Simple->new( ForceArray => [ 'revue', 'service' ], SuppressEmpty => '');
-    return $xmlsimple->XMLin($input);
+    my $data = $xmlsimple->parse_string($input);
+	die "\nAucune revue ne correspond (la liste reçue de Mirabel est vide).\n" unless $data and exists $data->{revue};
+	return $data;
 }
 
 sub get_services {
