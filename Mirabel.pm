@@ -77,11 +77,11 @@ sub filter_value_dates {
 sub filter_value_periode {
     my ($deb, $fin) = map { $a = $_; $a =~ s/-00//g; $a; } @_;
     if ($deb and $fin) {
-        return "$deb à $fin";
+        return "de $deb à $fin";
     } elsif ($deb and !$fin) {
-        return "Depuis $deb";
+        return "depuis $deb";
     } elsif (!$deb and $fin) {
-        return "Jusqu'à $fin";
+        return "jusqu'à $fin";
     } else {
         return "";
     }
