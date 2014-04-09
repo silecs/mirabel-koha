@@ -43,8 +43,8 @@ GetOptions (
     'mesressources',
     'simulation|dry-run|dryrun',
 );
-$opts{lacunaire} = !$opts{paslacunaire};
-$opts{selection} = !$opts{passelection};
+$opts{lacunaire} = !$opts{paslacunaire} if defined $opts{paslacunaire} ;
+$opts{selection} = !$opts{passelection} if defined $opts{passelection};
 
 # Print help thanks to Pod::Usage
 pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $opts{man};
