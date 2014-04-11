@@ -27,6 +27,12 @@ cmp_ok(not (exists$opts->{lacunaire}), '==', 1, "--paslacunaire");
 cmp_ok(not (exists $opts->{lacunaire}), '==', 1, "lacunaire=undef");
 cmp_ok(not (exists $opts->{paslacunaire}), '==', 1, "paslacunaire=undef");
 
+$opts = parse_arguments([qw/--partenaire=1 --config=data --type=texte --acces=libre --pas-selection --pas-lacunaire/]);
+cmp_ok(not (exists$opts->{lacunaire}), '==', 0, "* --paslacunaire *");
+
+ok((exists webservice_parameters($opts)->{lacunaire}), "URL parameter 'lacunaire'");
+cmp_ok(webservice_parameters($opts)->{lacunaire}, 'eq', '0', "URL parameter 'lacunaire'");
+
 dies_ok {
 	$opts = parse_arguments(["--paf"]);
 } "Non existent argument";

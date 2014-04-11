@@ -10,6 +10,7 @@ use Pod::Usage;
 use C4::Context;
 use C4::Biblio;
 use MARC::File::USMARC;
+use Mirabel;
 
 require Exporter;
 use vars       qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -55,10 +56,10 @@ sub parse_arguments {
 	) or die("Erreur : paramètres non valides.\n");
 
 	if (defined $opts->{paslacunaire}) {
-		$opts->{lacunaire} = not $opts->{paslacunaire};
+		$opts->{lacunaire} = $opts->{paslacunaire} ? 0 : 1;
 	}
 	if (defined $opts->{passelection}) {
-		$opts->{selection} = not $opts->{passelection};
+		$opts->{selection} = $opts->{passelection} ? 0 : 1;
 	}
 
 	# Print help thanks to Pod::Usage
@@ -74,7 +75,7 @@ sub validate_options {
 		pod2usage(-exitval => "NOEXIT", -verbose => 0);
 		die("## ERREUR : issn, issnl, et issne sont incompatibles.\n");
 	}
-	if ( $opts->{all} and (grep {defined($opts->{$_})}qw/partenaire issn issnl issne type acces lacunaire selection ressource/) ) {
+	if ( $opts->{all} and (grep {defined($opts->{$_})} qw/partenaire issn issnl issne type acces lacunaire selection ressource/) ) {
 		pod2usage(-exitval => "NOEXIT", -verbose => 0);
 		die("## ERREUR : --all est incompatible avec d'autres options.\n");
 	}
@@ -87,7 +88,7 @@ sub webservice_parameters {
 		$url_args->{all} = undef;
 	} else {
 		foreach (qw/partenaire issn issnl issne type acces selection revue ressource mesressources lacunaire selection/) {
-			$url_args->{$_} = $opts->{$_} if $opts->{$_};
+			$url_args->{$_} = $opts->{$_} if (defined $opts->{$_});
 		}
 	}
 	return $url_args;
