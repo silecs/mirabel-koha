@@ -29,9 +29,9 @@ cmp_ok(build_service_value("urldirecte|urlservice", $service), 'eq', "http://dia
 cmp_ok(build_service_value("id nom", $service), 'eq', "1195 Dialnet", "id nom");
 cmp_ok(build_service_value("debut fin", $service), 'eq', "2000", "debut fin");
 cmp_ok(build_service_value("fin debut", $service), 'eq', "2000", "fin debut");
-cmp_ok(build_service_value("debut fin:(periode)", $service), 'eq', "Depuis 2000", "debut fin:(periode)");
-cmp_ok(build_service_value("debut fin :(periode)", $service), 'eq', "Depuis 2000", "debut fin :(periode)");
-cmp_ok(build_service_value("fin debut :(periode)", $service), 'eq', "Jusqu'à 2000", "fin debut :(periode)");
+cmp_ok(build_service_value("debut fin:(periode)", $service), 'eq', "depuis 2000", "debut fin:(periode)");
+cmp_ok(build_service_value("debut fin :(periode)", $service), 'eq', "depuis 2000", "debut fin :(periode)");
+cmp_ok(build_service_value("fin debut :(periode)", $service), 'eq', "jusqu'à 2000", "fin debut :(periode)");
 $service->{fin} = "2005";
-cmp_ok(build_service_value("debut fin :(periode)", $service), 'eq', "2000 à 2005", ":(periode) avec 2 dates");
+cmp_ok(build_service_value("debut fin :(periode)", $service), 'eq', "de 2000 à 2005", ":(periode) avec 2 dates");
 
