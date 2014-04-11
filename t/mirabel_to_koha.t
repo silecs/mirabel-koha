@@ -3,8 +3,6 @@ use Test::More tests => 19;
 use FindBin;
 use lib "$FindBin::Bin/..";
 
-use XML::Simple qw(:strict);
-use YAML;
 use File::Slurp;
 use Mirabel;
 
@@ -14,8 +12,9 @@ use open qw( :encoding(UTF-8) :std );
 my $properfile = "data/properdata.txt";
 my $properdata = { map { chomp; my ($key,$value) = split /;/, $_; ( $key => $value ); } read_file($properfile, binmode => ':utf8') };
 
-my $configfile = "data/config.yml";
-my $config = YAML::LoadFile( $configfile );
+Mirabel::init("..", "data");
+my $properdata = Mirabel::read_data_config();
+my $config = Mirabel::read_service_config();
 
 my $xml = read_file("data/mirabel-1.xml", binmode => ':utf8');
 my $data = Mirabel::parse_xml($xml);

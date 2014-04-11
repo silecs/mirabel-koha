@@ -3,6 +3,8 @@ package Mirabel;
 use LWP::UserAgent;
 use URI;
 use XML::Simple;
+use YAML;
+
 use utf8;
 use open qw( :encoding(UTF-8) :std );
 
