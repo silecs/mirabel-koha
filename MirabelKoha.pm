@@ -21,6 +21,7 @@ our @ISA    = qw(Exporter);
 our @EXPORT = qw(
 	&parse_arguments
 	&validate_options
+	&webservice_parameters
 	&import_services
 );
 
