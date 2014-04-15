@@ -55,25 +55,39 @@ Résumé;resum
 Vous devez au préalable définir ces zones Marc dans vos grilles Marc,
 un champ par type de service : texte intégral, sommaire, résumé et indexation.
 
+#### Exemple commenté de config.yml
+
 ```yml
-texteint: 
-    field : 387 
-    a: "urldirecte|urlservice" 
-    b: "nom" 
-    c: "acces" 
-    d: "debut fin" 
-    e: "selection"
-    f: "lacunaire"
-    3: "id" 
-som: 
-    field: 388 
-    a: "urldirecte|urlservice" 
-    b: "nom" 
-    c: "acces" 
-    d: "debut fin" 
-    e: "selection"
-    f: "lacunaire"
-    3: "id" 
+# URL d'accès au webservice de Mir@bel
+base_url: 'http://www.reseau-mirabel.info/site/service'
+#
+# Configuration pour l'ajout et la modification
+update:
+    # Type d'accès (cf properdata.txt pour la liste des types)
+    texteint:
+        field: 857
+        # Les clés seront les noms des attributs de Koha pour ce champ (857.a etc).
+        # Les valeurs peuvent être :
+        #
+        #  * un champ du webservice Mir@bel ("acces")
+        #  * alternative ("urldirecte|urlservice" : si "urldirecte" est vide, alors "urlservice")
+        #  * concaténation ("debut fin" : champs "debut" concaténé avec "fin" via un espace de séparation)
+        #  * concaténation par un filtre "periode" ou "dates" ("debut fin :(periode)" appliquera le filtre "periode" aux 2 dates)
+        #
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin :(periode)"
+        e: "couverture"
+        3: "id"
+    som:
+        field: 388
+        a: "urldirecte|urlservice"
+        b: "nom"
+        c: "acces"
+        d: "debut fin :(periode)"
+        e: "couverture"
+        3: "id"
 ```
 
 Les champs disponibles sont ceux du webservice Mir@bel :
@@ -158,5 +172,7 @@ Services supprimés
 Le script `delete_services.pl` permet de supprimer les champs correspondant aux services supprimés dans Mir@bel.
 
 Lancé sans option, il interroge l'url <http://www.reseau-mirabel.info/site/service?suppr> et supprime les champs correspondants aux services supprimés depuis 24 heures, en se basant sur l'identifiant du service.
+
+On peut également forcer la suppression de tous les champs alimentés par Mir@bel.
 
 Sa documentation détaillée est consultable par la commande `perl delete_services.pl --man`.
