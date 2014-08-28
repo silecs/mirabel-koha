@@ -51,6 +51,7 @@ sub parse_arguments {
 		'passelection|pas-selection',
 		'revue=s',
 		'ressource|r=s',
+		'collection|c=s',
 		'mesressources',
 		'simulation|dry-run|dryrun',
 	) or die("Erreur : paramètres non valides.\n");
@@ -87,7 +88,7 @@ sub webservice_parameters {
 	if ($opts->{all}) {
 		$url_args->{all} = undef;
 	} else {
-		foreach (qw/partenaire issn issnl issne type acces selection revue ressource mesressources lacunaire selection/) {
+		foreach (qw/partenaire issn issnl issne type acces selection revue ressource collection mesressources lacunaire selection/) {
 			$url_args->{$_} = $opts->{$_} if (defined $opts->{$_});
 		}
 	}

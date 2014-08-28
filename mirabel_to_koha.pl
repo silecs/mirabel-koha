@@ -78,6 +78,7 @@ mirabel_to_koha.pl [options]
     --pas-selection      Exclut les accès sélections (certains articles manquent)
     --revue=             Seulement les accès de la revue : liste d'ID séparés par ","
     --ressource=    -r   Seulement les accès de la ressource : liste d'ID séparés par ","
+    --collection=   -c   Seulement les accès de la collection : liste d'ID séparés par ","
     --mesressources      Seulement pour les ressources suivies par ce partenaire
 
     --simulation
