@@ -59,6 +59,11 @@ sub build_service_value {
         my @and = split /\s/, $serviceKey;
         if ( scalar( @and ) > 1 ) {
             my @subvalues = map { (ref($service->{ $_ }) eq 'HASH') ? "" : $service->{ $_ } } @and;
+			if (@and and scalar(@and) != scalar(@subvalues)) {
+				printf STDERR
+					"Attention: %d champs attendus d'après la configuration, %d remplis\n",
+					scalar(@and), scalar(@subvalues);
+			}
             $value = $filter ? &$filter(@subvalues) : join(" ", grep {!/^$/} @subvalues);
         }
 
