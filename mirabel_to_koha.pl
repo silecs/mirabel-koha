@@ -20,7 +20,6 @@ my %opts = %{parse_arguments(\@ARGV)};
 
 # Load configuration files.
 Mirabel::init($opts{configkoha}, $opts{config});
-my $properdata = Mirabel::read_data_config();
 my $config = Mirabel::read_service_config();
 
 validate_options(\%opts);
@@ -35,7 +34,7 @@ foreach my $biblio ( @{ $data->{revue} } ) {
         next;
     }
     print "Mise à jour de la notice " . $biblio->{idpartenairerevue} . ":\n";
-    my $services = Mirabel::get_services( $biblio, $properdata, $config->{update} );
+    my $services = Mirabel::get_services( $biblio, $config->{types}, $config->{update} );
 
     my $record = GetMarcBiblio( $biblio->{idpartenairerevue} );
     print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );

@@ -38,20 +38,10 @@ Le script peut être installé dans /home/koha par exemple, en fonction de votre
 Configuration
 -------------
 
-### properdata.txt
-
-`properdata.txt` indique la correspondance entre les types d'accès en ligne renvoyés par le service REST et les types de services utilisés dans le script (sans espace ni caractère accentué) (ce fichier ne devrait pas être modifié)
-
-```
-Intégral;texteint 
-Sommaire;som 
-Indexation;index 
-Résumé;resum 
-```
-
 ### config.yml
 
 `config.yml` paramètre la correspondance entre les balises XML fournies par le service REST et les champs et sous-champs Koha.
+Un exemple de tel fichier est donné par `config.yml.dist`.
 Vous devez au préalable définir ces zones Marc dans vos grilles Marc,
 un champ par type de service : texte intégral, sommaire, résumé et indexation.
 
@@ -60,10 +50,12 @@ un champ par type de service : texte intégral, sommaire, résumé et indexation
 ```yml
 # URL d'accès au webservice de Mir@bel
 base_url: 'http://www.reseau-mirabel.info/site/service'
+type:
+	# [...] liste des types d'accès déclarés par Mir@bel (généralement, ne pas modifier ceci)
 #
 # Configuration pour l'ajout et la modification
 update:
-    # Type d'accès (cf properdata.txt pour la liste des types)
+    # Type d'accès (cf "types" ci-dessus pour la liste des types)
     texteint:
         field: 857
         # Les clés seront les noms des attributs de Koha pour ce champ (857.a etc).

@@ -9,11 +9,7 @@ use Mirabel;
 use utf8;
 use open qw( :encoding(UTF-8) :std );
 
-my $properfile = "data/properdata.txt";
-my $properdata = { map { chomp; my ($key,$value) = split /;/, $_; ( $key => $value ); } read_file($properfile, binmode => ':utf8') };
-
 Mirabel::init("..", "data");
-my $properdata = Mirabel::read_data_config();
 my $config = Mirabel::read_service_config();
 
 my $xml = read_file("data/mirabel-1.xml", binmode => ':utf8');
@@ -28,7 +24,7 @@ my $biblio = $revues->[0];
 cmp_ok($biblio->{idpartenairerevue}, '==', 30, "idpartenairerevue");
 cmp_ok($biblio->{issn}, 'eq', '0001-7728', "issn");
 
-my $services = get_services( $biblio, $properdata, $config->{update} );
+my $services = get_services( $biblio, $config->{types}, $config->{update} );
 cmp_ok(scalar @$services, '==', 3, "Services");
 
 cmp_ok($services->[0]{id}, '==', 1195, "Service 1 : id");

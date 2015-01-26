@@ -18,7 +18,6 @@ our @EXPORT = qw(
   &query_webservice
   &get_services
   &read_service_config
-  &read_data_config
   &build_service_value
 );
 
@@ -63,7 +62,7 @@ sub build_service_value {
             $value = $filter ? &$filter(@subvalues) : join(" ", grep {!/^$/} @subvalues);
         }
 
-        unless ( $value ) {
+        if ( not $value ) {
             $value = $service->{ $serviceKey };
         }
         if ($value) {
@@ -115,17 +114,17 @@ sub parse_xml {
 }
 
 sub get_services {
-    my ($biblio, $properdata, $config) = @_;
+    my ($biblio, $types, $config) = @_;
 
     my $services = [];
     foreach ( sort {$a <=> $b} keys(%{ $biblio->{services}->{service} }) ) {
         my $service = $biblio->{services}->{service}->{$_};
         $service->{id} = $_;
-        if (!defined $properdata->{ $service->{type} }) {
+        if (!defined $types->{ $service->{type} }) {
             warn "Type de service inconnu : $service->{type}\n";
             next;
         }
-        my $type = $properdata->{ $service->{type}  };
+        my $type = $types->{ $service->{type}  };
         if (defined $config->{ $type }) {
             push @$services, {
                 type => $type,
@@ -144,15 +143,6 @@ sub read_service_config {
     init();
     my $configfile = $path . "config.yml";
     return YAML::LoadFile( $configfile );
-}
-
-sub read_data_config {
-    init();
-    my $properfile = $path . "properdata.txt";
-    open my $pdfh, "<", $properfile or die "$properfile : $!";
-    my $properdata = { map { chomp;  if (/^\s*$/) { (); } else { my ($key,$value) = split /;/,$_; ( $key => $value );} } <$pdfh> };
-    close $pdfh;
-    return $properdata;
 }
 
 # private function
@@ -180,9 +170,9 @@ sub get_config_path {
     }
     $path =~ s{([^/])$}{$1/}; # add trailing /
     die "Le chemin vers les fichiers de configuration pour Mirabel n'est pas un répertoire valide : $path\n"
-        unless (-d $path and -r "${path}config.yml" and -r "${path}properdata.txt");
+        unless (-d $path and -r "${path}config.yml");
 
-    warn "Config Mirabel (config.yml et properdata.txt) lue dans $path\n";
+    warn "Config Mirabel (config.yml) lue dans $path\n";
     return $path;
 }
 

@@ -1,9 +1,15 @@
 # URL d'accès au webservice de Mir@bel
 base_url: 'http://www.reseau-mirabel.info/site/service'
+types:
+    "Texte Intégral": texteint
+    "Intégral": texteint
+    "Sommaire": som
+    "Indexation": index
+    "Résumé": resum
 #
 # Configuration pour l'ajout et la modification
 update:
-    # Type d'accès (cf properdata.txt pour la liste des types)
+    # Type d'accès (cf "types" ci-dessus pour la liste des types)
     texteint:
         field: 857
         # Les clés seront les noms des attributs de Koha pour ce champ (857.a etc).
