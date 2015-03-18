@@ -71,6 +71,10 @@ sub parse_arguments {
                     . "\tSans l'option --partenaire, les identifiants Koha des titres ne seront pas reçus,\n"
                     . "\tDonc aucune action ne sera possible dans Koha.\n\n";
 	}
+	if (@$argv) {
+		print STDERR "### Attention\n"
+			. "\tParamètres non reconnus : " . join(' ', @$argv) . "\n\n";
+	}
 
 	return $opts;
 }
