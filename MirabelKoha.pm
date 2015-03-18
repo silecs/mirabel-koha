@@ -66,6 +66,12 @@ sub parse_arguments {
 	# Print help thanks to Pod::Usage
 	pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $opts->{man};
 
+	if (not defined $opts->{partenaire}) {
+		print STDERR "### Attention\n"
+                    . "\tSans l'option --partenaire, les identifiants Koha des titres ne seront pas reçus,\n"
+                    . "\tDonc aucune action ne sera possible dans Koha.\n\n";
+	}
+
 	return $opts;
 }
 
