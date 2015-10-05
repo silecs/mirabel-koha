@@ -171,7 +171,9 @@ sub get_config_path {
             if (-f $path) {
                 $path =~ s{/[^/]+?$}{/}; # TODO: use a proper dirname() function
             }
-        }
+        } else {
+			warn "Le fichier $kohaConfFile ne contient pas le champ config.mirabel.\n";
+		}
     }
     $path =~ s{([^/])$}{$1/}; # add trailing /
     die "Le chemin vers les fichiers de configuration pour Mirabel n'est pas un répertoire valide : $path\n"

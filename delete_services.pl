@@ -19,8 +19,9 @@ use lib "$FindBin::Bin";
 use Mirabel;
 
 my %opts = (
-    "acces-ids" => "",
+    "acces" => "",
     "depuis" => DateTime->from_epoch(epoch => time()-3600*24)->ymd(),
+    "verbose" => 0,
 );
 
 GetOptions (
@@ -29,6 +30,7 @@ GetOptions (
     'acces|acces-ids|accesids|a=s',
     'depuis|since|d=s',
     'simulation|dry-run|dryrun',
+    'verbose|verbeux|v',
 );
 
 # Print help thanks to Pod::Usage
@@ -41,10 +43,11 @@ my @listOfFields;
 push @listOfFields, $config->{delete}{$_}{field} for keys %{$config->{delete}};
 warn "Champs à supprimer dans Koha : ", join(", ", sort {$a <=> $b} @listOfFields), "\n";
 
-my $biblios = get_biblios();
-
 my @to_del;
 if ($opts{acces}) {
+    if ($opts{verbose}) {
+        warn "Accès en paramètres, donc pas de téléchargement auprès de Mir\@bel.\n";
+    }
     foreach (split /,/, $opts{acces}) {
         my ($start, $end) = split /\-/;
         if ($end) {
@@ -55,10 +58,27 @@ if ($opts{acces}) {
         }
     }
 } else {
-    # Services deleted since yesterday.
+    # Services deleted (since yesterday).
     my $url = $config->{base_url} . '?suppr=' . $opts{depuis};
+    if ($opts{verbose}) {
+        warn "Téléchargement auprès de Mir\@bel : $url\n";
+    }
 
     my $docs = get $url;
+    if (!$docs) {
+        warn "ERREUR : le téléchargement de $url a échoué.\n";
+        if ($opts{verbose}) {
+            warn "Pour information, voici les en-têtes HTTP reçus :\n",
+                join("\n", LWP::Simple::head($url)), "\n";
+        }
+        exit 2;
+    }
+    if ($opts{verbose}) {
+        warn "    Téléchargement réussi : " . length($docs) . " octets.\n";
+    }
+    if ($opts{verbose}) {
+        warn "Lecture des données reçues.\n";
+    }
     my $xmlsimple = XML::Simple->new( ForceArray => ['service'] );
     my $data = $xmlsimple->XMLin($docs);
 
@@ -66,7 +86,13 @@ if ($opts{acces}) {
     print "Supprime les services qui n'existent plus. ($url)\n";
     push @to_del, $_ for @{ $data->{service} };
 }
+
+if ($opts{verbose}) {
+    warn "Services à supprimer : " . scalar(@to_del) . "\n";
+}
 my %to_del = map {$_ => 1} @to_del;
+
+my $biblios = get_biblios();
 
 foreach my $biblio ( @$biblios ) {
     my $biblionumber = $biblio->{biblionumber};
