@@ -90,34 +90,42 @@ if ($opts{acces}) {
 if ($opts{verbose}) {
     warn "Services à supprimer : " . scalar(@to_del) . "\n";
 }
-my %to_del = map {$_ => 1} @to_del;
+services_delete(@to_del) if @to_del;
+print "Terminé\n";
 
-my $biblios = get_biblios();
+=pod
+services_delete(id1, id2, ...)
 
-foreach my $biblio ( @$biblios ) {
-    my $biblionumber = $biblio->{biblionumber};
-    my $record = GetMarcBiblio( $biblionumber );
+Params: list of integers IDs
+=cut
+sub services_delete {
+    my %to_del = map {$_ => 1} @_;
+    my $biblios = get_biblios();
 
-    my $countfield = 0;
-    my @fields_to_delete = ();
+    foreach my $biblio ( @$biblios ) {
+        my $biblionumber = $biblio->{biblionumber};
+        my $record = GetMarcBiblio( $biblionumber );
 
-    foreach my $field ( $record->field(@listOfFields) ) {
-        my $id = $field->subfield('3');
-        if ( $id and exists $to_del{$id} ) {
-            if ($opts{simulation}) {
-                print "* biblionumber=$biblionumber : subfield('3')=$id\n";
-            } else {
-                push @fields_to_delete, $field;
+        my $countfield = 0;
+        my @fields_to_delete = ();
+
+        foreach my $field ( $record->field(@listOfFields) ) {
+            my $id = $field->subfield('3');
+            if ( $id and exists $to_del{$id} ) {
+                if ($opts{simulation}) {
+                    print "* biblionumber=$biblionumber : subfield('3')=$id\n";
+                } else {
+                    push @fields_to_delete, $field;
+                }
             }
         }
-    }
-    if ( @fields_to_delete ) {
-        $record->delete_fields( @fields_to_delete );
-        ModBiblioMarc( $record, $biblionumber, GetFrameworkCode($biblionumber) );
-        printf "    $biblionumber: %d deleted\n", scalar(@fields_to_delete);
+        if ( @fields_to_delete ) {
+            $record->delete_fields( @fields_to_delete );
+            ModBiblioMarc( $record, $biblionumber, GetFrameworkCode($biblionumber) );
+            printf "    $biblionumber: %d deleted\n", scalar(@fields_to_delete);
+        }
     }
 }
-print "Terminé\n";
 
 sub get_biblios {
     my $dbh = C4::Context->dbh;
@@ -156,6 +164,7 @@ Par défaut, demande à Mir@bel les accès supprimés depuis 24 heures.
     --acces-ids=    -a
     --depuis=       -d
     --simulation
+    --verbeux       -v
 
 =head1 DESCRIPTION
 
