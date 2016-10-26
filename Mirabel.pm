@@ -35,45 +35,59 @@ sub init {
 
 
 sub build_service_value {
-        my $serviceKey = shift;
-        my $service = shift;
+    my $serviceKey = shift;
+    my $service = shift;
+    my $biblio = shift;
 
-        my $value;
+    my $value;
 
-        my $filter;
-        if ($serviceKey =~ s/\s*:\((\w+)\)\s*$//) {
-            $filter = "filter_value_" . $1;
-            $filter = (exists &{$filter}) ? \&{$filter} : "";
-        }
+    my $filter;
+    if ($serviceKey =~ s/\s*:\((\w+)\)\s*$//) {
+        $filter = "filter_value_" . $1;
+        $filter = (exists &{$filter}) ? \&{$filter} : "";
+    }
 
-        # Cas des valeurs séparées par |. (ou)
-        my @or = split /\|/, $serviceKey;
-        if ( scalar( @or ) > 1 ) {
-            foreach ( @or ) {
-                $value = $service->{ $_ } if $service->{ $_ } && ref($service->{ $_ }) ne 'HASH';
-                last if $value;
-            }
+    # Cas des valeurs séparées par | (ou)
+    my @or = split /\|/, $serviceKey;
+    if ( scalar( @or ) > 1 ) {
+        foreach ( @or ) {
+            $value = read_single_value($_, $service, $biblio);
+            last if $value;
         }
+    }
 
-        # Cas des valeurs séparées par un espace.
-        my @and = split /\s/, $serviceKey;
-        if ( scalar( @and ) > 1 ) {
-            my @subvalues = map { (ref($service->{ $_ }) eq 'HASH') ? "" : $service->{ $_ } } @and;
-			if (@and and scalar(@and) != scalar(@subvalues)) {
-				printf STDERR
-					"Attention: %d champs attendus d'après la configuration, %d remplis\n",
-					scalar(@and), scalar(@subvalues);
-			}
-            $value = $filter ? &$filter(@subvalues) : join(" ", grep {!/^$/} @subvalues);
+    # Cas des valeurs séparées par un espace.
+    my @and = split /\s/, $serviceKey;
+    if ( scalar( @and ) > 1 ) {
+        my @subvalues = map { read_single_value($_, $service, $biblio) } @and;
+        if (@and and scalar(@and) != scalar(@subvalues)) {
+            printf STDERR
+                "Attention: %d champs attendus d'après la configuration, %d remplis\n",
+                scalar(@and), scalar(@subvalues);
         }
+        $value = $filter ? &$filter(@subvalues) : join(" ", grep {!/^$/} @subvalues);
+    }
 
-        if ( not $value ) {
-            $value = $service->{ $serviceKey };
+    if ( not $value ) {
+        $value = read_single_value($serviceKey, $service, $biblio);
+    }
+    if ($value) {
+        $value =~ s/-00//g;
+    }
+    return $value;
+}
+
+sub read_single_value {
+    my ($name, $service, $biblio) = @_;
+    if ($name =~ m/^titre\.(.+)/) {
+        my $bname = $1;
+        if (exists $biblio->{ $bname } && ref($biblio->{ $bname }) ne 'HASH') {
+            return $biblio->{ $bname };
         }
-        if ($value) {
-            $value =~ s/-00//g;
-        }
-        return $value;
+    } elsif (exists $service->{ $name } && ref($service->{ $name }) ne 'HASH') {
+        return $service->{ $name };
+    }
+    return;
 }
 
 sub filter_value_dates {

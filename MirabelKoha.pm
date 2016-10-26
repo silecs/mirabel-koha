@@ -111,7 +111,7 @@ sub import_services {
 
         #delete_same( $record, $todo, $service);
 
-        my $newfield = createField( $s->{todo}, $s->{service} );
+        my $newfield = createField( $s->{todo}, $s->{service}, $biblio );
         reorder_subfields( $newfield );
 
         my $exists = 0;
@@ -166,11 +166,12 @@ sub delete_same {
 sub createField {
     my $todo = shift;
     my $service = shift;
+	my $biblio = shift;
 
     my $field;
     my $fieldcreated = 0;
     foreach my $key ( keys %$todo ) {
-        my $value = build_service_value($todo->{$key}, $service);
+        my $value = build_service_value($todo->{$key}, $service, $biblio);
         next unless $value;
 
         if ( $key ne "field" ) {

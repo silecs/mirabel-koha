@@ -62,6 +62,7 @@ update:
         # Les valeurs peuvent être :
         #
         #  * un champ du webservice Mir@bel ("acces")
+        #  * un champ du webservice Mir@bel pour le titre/revue ("titre.issn")
         #  * alternative ("urldirecte|urlservice" : si "urldirecte" est vide, alors "urlservice")
         #  * concaténation ("debut fin" : champs "debut" concaténé avec "fin" via un espace de séparation)
         #  * concaténation par un filtre "periode" ou "dates" ("debut fin :(periode)" appliquera le filtre "periode" aux 2 dates)
@@ -95,6 +96,10 @@ Les champs disponibles sont ceux du webservice Mir@bel :
 * urldirecte
 * debut
 * fin
+* titre.issn
+* titre.url
+* titre.idmirabel
+* titre.idpartenairerevue
 
 **Attention à la syntaxe dans le fichier yml**, les espaces ont de l'importance ; ne pas mettre de tabulation à la place d'un espace.
 
