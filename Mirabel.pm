@@ -87,6 +87,7 @@ sub read_single_value {
     } elsif (exists $service->{ $name } && ref($service->{ $name }) ne 'HASH') {
         return $service->{ $name };
     }
+	warn "Le champ '$name' n'est pas valide.\n";
     return;
 }
 
