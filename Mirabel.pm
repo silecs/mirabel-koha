@@ -17,18 +17,18 @@ our $VERSION = 2.0;
 our @EXPORT = qw(
   &query_webservice
   &get_services
-  &read_service_config
+  &read_config
   &build_service_value
 );
 
 
-my $path;
+my $configfile;
 
 sub init {
-    if (!$path) {
-        $path = get_config_path(@_);
+    if (!$configfile) {
+        $configfile = get_config_path(@_);
         die "/!\\ ERROR path is not set: You must set the configuration files path in koha_conf.xml\n"
-            unless $path;
+            unless $configfile;
     }
 }
 
@@ -159,15 +159,15 @@ sub get_services {
     return $services;
 }
 
-sub read_service_config {
+sub read_config {
     init();
-    my $configfile = $path . "config.yml";
     return YAML::LoadFile( $configfile );
 }
 
 # private function
 sub get_config_path {
     my $kohaConfFile = shift;
+    my $configfile;
     $path = shift;
 
     if (!$path) {
@@ -182,20 +182,21 @@ sub get_config_path {
         warn "Config Koha : $kohaConfFile\n";
 
         $path = $koha_conf->{config}->{mirabel};
-        if ($path && ref($path) ne 'HASH') {
-            if (-f $path) {
-                $path =~ s{/[^/]+?$}{/}; # TODO: use a proper dirname() function
-            }
-        } else {
-			warn "Le fichier $kohaConfFile ne contient pas le champ config.mirabel.\n";
-		}
+        if (!$path or ref($path) eq 'HASH') {
+            warn "Le fichier $kohaConfFile ne contient pas le champ config.mirabel.\n";
+        }
     }
-    $path =~ s{([^/])$}{$1/}; # add trailing /
+    if (-d $path) {
+        $path =~ s{/[^/]+?$}{/}; # TODO: use a proper dirname() function
+        $configfile = $path . "config.yml";
+    } else {
+        $configfile = $path;
+    }
     die "Le chemin vers les fichiers de configuration pour Mirabel n'est pas un répertoire valide : $path\n"
-        unless (-d $path and -r "${path}config.yml");
+        unless (-f -r $configfile);
 
-    warn "Config Mirabel (config.yml) lue dans $path\n";
-    return $path;
+    warn "Config Mirabel lue dans $configfile\n";
+    return $configfile;
 }
 
 1;

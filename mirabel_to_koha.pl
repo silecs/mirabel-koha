@@ -20,7 +20,7 @@ my %opts = %{parse_arguments(\@ARGV)};
 
 # Load configuration files.
 Mirabel::init($opts{configkoha}, $opts{config});
-my $config = Mirabel::read_service_config();
+my $config = Mirabel::read_config();
 
 validate_options(\%opts);
 
