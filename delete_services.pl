@@ -27,6 +27,8 @@ my %opts = (
 GetOptions (
     \%opts,
     'man',
+    'config=s',
+    'configkoha|config-koha=s',
     'acces|acces-ids|accesids|a=s',
     'depuis|since|d=s',
     'simulation|dry-run|dryrun',
@@ -37,7 +39,8 @@ GetOptions (
 pod2usage({-verbose => 2, -utf8 => 1, -noperldoc => 1}) if $opts{man};
 
 # Load configuration files.
-my $config = Mirabel::read_service_config();
+Mirabel::init($opts{configkoha}, $opts{config});
+my $config = Mirabel::read_config();
 
 my @listOfFields;
 push @listOfFields, $config->{delete}{$_}{field} for keys %{$config->{delete}};
@@ -161,6 +164,10 @@ Par défaut, demande à Mir@bel les accès supprimés depuis 24 heures.
  Options :
     --help          -h
     --man
+
+    --config=
+    --config-koha=
+
     --acces-ids=    -a
     --depuis=       -d
     --simulation

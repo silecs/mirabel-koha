@@ -157,7 +157,7 @@ Pour mettre à jour Koha avec tous les accès (libre + restreints, tous types) d
 
 ```sh
 # syntaxe étendue
-perl mirabel_to_koha.pl --partenaire=2 --type=tout --acces=tout
+perl mirabel_to_koha.pl --config=config.yml --config-koha= --partenaire=2 --type=tout --acces=tout
  
 # syntaxe brève
 ./mirabel_to_koha.pl -p 2 -t tout -a tout

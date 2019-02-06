@@ -7,7 +7,12 @@ types:
     "Indexation": index
     "Résumé": resum
 #
-# Configuration pour l'ajout et la modification
+# Configuration pour l'ajout et la modification de revues
+journals:
+    field: 863
+	e: "url"
+#
+# Configuration pour l'ajout et la modification d'accès
 update:
     # Type d'accès (cf "types" ci-dessus pour la liste des types)
     texteint:

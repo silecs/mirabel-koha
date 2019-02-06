@@ -10,7 +10,7 @@ use utf8;
 use open qw( :encoding(UTF-8) :std );
 
 Mirabel::init("..", "data");
-my $config = Mirabel::read_service_config();
+my $config = Mirabel::read_config();
 
 my $xml = read_file("data/mirabel-1.xml", binmode => ':utf8');
 my $data = Mirabel::parse_xml($xml);

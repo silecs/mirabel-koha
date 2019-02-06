@@ -168,7 +168,7 @@ sub read_config {
 sub get_config_path {
     my $kohaConfFile = shift;
     my $configfile;
-    $path = shift;
+    my $path = shift;
 
     if (!$path) {
         if (!$kohaConfFile) {
