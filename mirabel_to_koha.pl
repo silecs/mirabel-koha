@@ -33,10 +33,12 @@ foreach my $biblio ( @{ $data->{revue} } ) {
         printf "La revue d'ISSN %s n'a pas d'identifiant local.\n", $biblio->{issn};
         next;
     }
+    $biblio->{biblionumber} = $biblio->{idpartenairerevue};
     print "Mise à jour de la notice " . $biblio->{idpartenairerevue} . ":\n";
     my $services = Mirabel::get_services( $biblio, $config->{types}, $config->{update} );
 
-    my $record = GetMarcBiblio( $biblio->{idpartenairerevue} );
+    my $param = MirabelKoha::isKohaVersionAtLeast(17, 11) ? $biblio : $biblio->{biblionumber};
+    my $record = GetMarcBiblio( $param );
     print "    => La notice existe: " . ( $record ? "oui\n" : "non\n" );
 
     if ($record and !$opts{simulation}) {

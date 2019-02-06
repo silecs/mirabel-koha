@@ -107,7 +107,8 @@ sub services_delete {
 
     foreach my $biblio ( @$biblios ) {
         my $biblionumber = $biblio->{biblionumber};
-        my $record = GetMarcBiblio( $biblionumber );
+        my $param = MirabelKoha::isKohaVersionAtLeast(17, 11) ? $biblio : $biblio->{biblionumber};
+        my $record = GetMarcBiblio( $param );
 
         my $countfield = 0;
         my @fields_to_delete = ();

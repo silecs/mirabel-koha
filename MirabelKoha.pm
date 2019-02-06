@@ -7,6 +7,7 @@ use open qw( :encoding(UTF-8) :std );
 use Getopt::Long qw(:config auto_help);
 use Pod::Usage;
 
+use Koha;
 use C4::Context;
 use C4::Biblio;
 use MARC::File::USMARC;
@@ -24,8 +25,16 @@ our @EXPORT = qw(
 	&validate_options
 	&webservice_parameters
 	&import_services
+	&isKohaVersionAtLeast
 );
 
+sub isKohaVersionAtLeast {
+    my ($major, $minor) = @_;
+    my $version = Koha::version;
+    $version =~ m/^(\d+)\.(\d+)/;
+    return false if ($1 < $major);
+    return (not $minor or $minor <= $2);
+}
 
 sub parse_arguments {
 	my $argv = shift;
